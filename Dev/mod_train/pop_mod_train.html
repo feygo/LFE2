@@ -1,0 +1,48 @@
+﻿<!doctype html>
+<html>
+  <head>
+	<title>Linodas Extension Training Popup</title>
+	<style>
+		.wh {  
+		 width:510px;/*自动适应父布局宽度*/  
+		 height:500px;
+		}  
+	</style>
+  
+		
+  </head>
+
+  <body >
+	<div id="content" class=wh>
+		<div>
+			<table >
+				<tr>			
+					<td>   可选卡组：<select  id="trn_list"></select></td>
+					<td>;目标怪物：<select  id="mob_list"></select></td>
+				</tr>
+				<tr>
+					<td>可用行动点：<span id="apNum"/></span></td>
+					<td>;可训练次数：<span id="capNum"/></span></td>
+				</tr>
+				<tr>				
+					<td>需训练次数：<input type="text" size="3" maxlength="3"  id="trnNum" value=""/></td>
+					<td>;用尽AP：<input type="checkbox"  id="isAll"/></td>
+				</tr>
+				<tr>
+					<td>失败次数：<select  id="fail_list"></select></td>
+					<td><button id="trn_Btn">训练</button></td>
+				</tr>
+			</table>
+		</div>
+		<hr/>
+		<div id="rsDiv" >
+			上次训练的结果为：<br>
+			<table id="rs" border=1 width=480px>
+			</table>
+		</div>
+	</div>
+	<script src='pop_mod_train.js' type='text/javascript' charset="utf-8"></script>
+	<script src='../pop/pop_tools.js' type='text/javascript' charset="utf-8"></script>
+ 	<link href="../css/common.css" rel="stylesheet" type="text/css"  charset="utf-8" />
+  </body>
+</html>

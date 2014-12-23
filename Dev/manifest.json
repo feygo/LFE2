@@ -1,0 +1,34 @@
+{
+	"manifest_version": 2,
+	"name": "Linodas Feygo Extension v2",
+	"version": "0.1.0",
+	"description": "The extension for Linodas by Feygo.",
+	
+	"options_page": "/option/options.html",
+
+	"page_action": {
+		"default_icon": "/icon/icon128.png",
+		"default_title": "ToolTip",
+		"default_popup": "/pop/pop_main.html"
+	},
+	
+	"permissions": [
+	    "tabs","http://www.linodas.com/*"
+	],
+	"background": {
+		"page": "/bg/bg.html"
+	},
+	"icons": 
+	{            
+		"128": "/icon/icon128.png" 
+	},  
+	"content_scripts" : [
+		{
+		"matches" : [ "http://www.linodas.com/*" ],
+		"js" : [ "/csj/main_msg.js","/csj/main_tools.js","/csj/main.js" ],
+		"run_at" : "document_idle",
+		"all_frames" : false
+		}
+	]
+
+}

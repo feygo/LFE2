@@ -1,0 +1,75 @@
+	var gdStr=localStorage.getItem(key);
+	
+	var gdStr=localStorage.setItem(key,value);
+	
+	var gearData=JSON.parse(gdStr);
+	var gdStr=JSON.stringify(gearData);
+
+localStorage.setItem(key1,JSON.stringify(value));
+var is=JSON.parse(localStorage.getItem(key2));
+
+parseInt
+
+parentElement
+split
+
+var osName=window.event.srcElement.value;
+
+		var r=confirm(info+"\n是否不再提示本次更新信息！");
+		if (r==true){
+
+appendChild() 
+
+createElement
+childNodes 
+
+document.querySelectorAll
+document.querySelector
+//附加内容
+				var tmpBr1=document.createElement("br");				
+				var tmpSt=document.createElement("span");
+				tmpSt.className="cardtitle CRAFT";
+				tmpSt.innerText=sl;
+				aList[i].children[1].appendChild(tmpBr1);
+				aList[i].children[1].appendChild(tmpSt);
+				
+===================================================================================
+/************************ 数据预备区 **********************/
+// {user:"",note:""}
+const DB_OS_Note = USER_NAME+"#note";
+const DB_NAME_Note = 'LFE2#Mod#Note';
+
+var DB_Note;
+
+function update_DB_Note(evt){
+	evt.currentTarget.result.createObjectStore(DB_OS_Note, { keyPath: "user" });
+}
+
+function success_DB_Note(evt){
+	DB_Note = evt.currentTarget.result;
+}
+/********************** 通道消息 处理区**********************/
+function handlePort_modNote(port){	
+	if(port.name == "mod_note"){
+		port.onMessage.addListener(function(msg) {
+			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+			if (msg.cmd == "loadRec"){
+				loadRec(port);
+			}else if (msg.cmd == "saveRec"){
+				saveRec(msg.data);
+			}
+		});
+	}
+}
+
+
+/********************** 自动执行区**********************/
+function csjLoad_mod_note(){
+	chrome.runtime.onConnect.addListener(handlePort_modNote);
+	Tool_getDB(DB_NAME_Note,[DB_OS_Note],update_DB_Note,success_DB_Note);
+}
+csjLoad_mod_note();
+// Tool_delDB(DB_NAME_Note);
+
+log("load csj_mod_note.js done");
+"

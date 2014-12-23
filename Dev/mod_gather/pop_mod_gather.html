@@ -1,0 +1,45 @@
+﻿<!doctype html>
+<html>
+  <head>
+	<title>Linodas Extension Gathering Popup</title>
+	<style>
+		.wh {  
+		 width:500px;/*自动适应父布局宽度*/  
+		 height:500px;
+		}  
+	</style>
+  
+		
+  </head>
+
+  <body >
+	<div id="content" class=wh>
+		<div>
+			<table >
+				<tr>			
+					<td>可选采集项：<select  id="ga_list"></select></td>
+					<td>;可用行动点：<span id="apNum"/></span></td>
+					<td>;可采集次数：<span id="capNum"/></span></td>
+				</tr>
+				<tr>
+					<td>需采集次数：<input type="text" size="3" maxlength="3"  id="cjNum" value=""/></td>
+					<td>;用尽AP：<input type="checkbox"  id="isAll"/></td>
+					<td>;失败次数：<select  id="fail_list"></select></td>
+					<td><button id="ga_Btn">采集</button></td>
+				</tr>
+			</table>
+		</div>
+		<hr/>
+		<div id="rsDiv">
+			上次采集的结果为：<br>
+			<table id="rs" border=1 width=480px>
+			</table>
+		</div>
+	</div>
+	
+	<script src='pop_mod_gather.js' type='text/javascript' charset="utf-8"></script>
+	<script src='../pop/pop_tools.js' type='text/javascript' charset="utf-8"></script>
+ 	<link href="../css/common.css" rel="stylesheet" type="text/css"  charset="utf-8" />
+
+  </body>
+</html>

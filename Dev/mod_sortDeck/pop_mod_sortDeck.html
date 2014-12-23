@@ -1,0 +1,123 @@
+﻿<!doctype html>
+<html>
+  <head>
+	<title>Linodas Extension Deck Popup</title>
+	<style>
+		.wh {  
+		 width:350px;/*自动适应父布局宽度*/  
+		 height:350px;
+		}  
+	</style>
+
+  </head>
+
+  <body >
+	<div id="content" class=wh>
+		<table border="1" cellpadding="0" cellspacing="0">
+				<tr><td colspan=2><b>卡片排序功能：</b></td></tr>
+				<tr>
+					<td>直接攻击：</td>
+					<td>
+						<button name="sortBtn" value="sExByDmg_PD">物</button>
+						<button name="sortBtn" value="sExByDmg_MD">魔</button>
+						<button name="sortBtn" value="sExByDmg_PMD">双</button>
+						<button name="sortBtn" value="sExByDmg_SD">精</button>
+						<button name="sortBtn" value="sExByDmg_HD">混</button>
+						<button name="sortBtn" value="sExByDmg_ZD">真</button>
+					</td>
+				</tr>
+				<tr>
+					<td>直接防御：</td>
+					<td>
+						<button name="sortBtn" value="sExByDef_AM">护甲</button>
+						<button name="sortBtn" value="sExByDef_AMex">护叠</button>
+						<button name="sortBtn" value="sExByDef_WD">魔甲</button>
+						<button name="sortBtn" value="sExByDef_WDex">魔叠</button>
+						<button name="sortBtn" value="sExByDef_AMWD">双甲</button>
+						
+						<br>
+						<button name="sortBtn" value="sExByDef_WP">韧性</button>
+						<button name="sortBtn" value="sExByDef_WPex">韧叠</button>
+						<button name="sortBtn" value="sExByDef_AU">适应</button>
+						<button name="sortBtn" value="sExByDef_AUex">适叠</button>
+						
+					</td>
+				</tr>
+				<tr>
+				<td>自身改变：</td>
+					<td>
+						<button name="sortBtn" value="sExByDmgSF_addPDnx">物下↑</button>           
+						<button name="sortBtn" value="sExByDmgSF_addMDnx">魔下↑</button>          
+						<button name="sortBtn" value="sExByDmgSF_addPDfe">物永↑</button>          
+						<button name="sortBtn" value="sExByDmgSF_addMDfe">魔永↑</button>          
+						<br>                                                                      
+						<button name="sortBtn" value="sExByDmgSF_decPDnx">物下↓</button>          
+						<button name="sortBtn" value="sExByDmgSF_decMDnx">魔下↓</button>          
+						<button name="sortBtn" value="sExByDmgSF_decPDfe">物永↓</button>          
+						<button name="sortBtn" value="sExByDmgSF_decMDfe">魔永↓</button>          
+					</td>                                                                         
+				</tr>                                                                             
+				                                                                                  
+				<tr>                                                                              
+					<td>破甲穿透：</td>                                                          
+					<td>                                                                          
+						<button name="sortBtn" value="sExByDes_AM">破护</button>                  
+						<button name="sortBtn" value="sExByDes_WD">破魔</button>                  
+						<button name="sortBtn" value="sExByPene_PD">物穿</button> 
+						<button name="sortBtn" value="sExByPene_MD">魔穿</button> 
+						<button name="sortBtn" value="sExByPene_Pre">穿比</button>
+					</td>
+				</tr>
+				<tr>
+					<td>锁定保护：</td>
+					<td>
+						<button name="sortBtn" value="sExByFP_FS">锁定</button>              
+						<button name="sortBtn" value="sExByFP_FSex">锁叠</button>            
+						<button name="sortBtn" value="sExByFP_PT">防护</button>              
+						<button name="sortBtn" value="sExByFP_PTex">防叠</button>            
+						<button name="sortBtn" value="sExByFP_CC">消除</button>              
+					</td>                                                                    
+				</tr>                                                                        
+                                                                                             
+				<tr>                                                                         
+					<td>目标对象：</td>
+					<td>
+						<button name="sortBtn" value="sExByAim_SF">自身</button>
+						<button name="sortBtn" value="sExByAim_YF">友方</button>                   
+						<button name="sortBtn" value="sExByAim_DF">敌方</button>                   
+						<button name="sortBtn" value="sExByAim_ALL">所有</button>                  
+					</td>                                                                          
+				</tr>                                                                              
+				<tr>                                                                               
+					<td>对象改变：</td>                                                            
+					<td>                                                                           
+						<button name="sortBtn" value="sExByDmgMB_addPDnx">物下↑</button>       
+						<button name="sortBtn" value="sExByDmgMB_addMDnx">魔下↑</button>       
+						<button name="sortBtn" value="sExByDmgMB_addPDfe">物永↑</button>       
+						<button name="sortBtn" value="sExByDmgMB_addMDfe">魔永↑</button>       
+						<br>                                                                   
+						<button name="sortBtn" value="sExByDmgMB_decPDnx">物下↓</button>       
+						<button name="sortBtn" value="sExByDmgMB_decMDnx">魔下↓</button>       
+						<button name="sortBtn" value="sExByDmgMB_decPDfe">物永↓</button>       
+						<button name="sortBtn" value="sExByDmgMB_decMDfe">魔永↓</button>       
+					</td>                                                                      
+				</tr>				                                                           
+				<tr>                                                                           
+					<td>其他：</td>                                                           
+					<td>                                                                       
+						<button name="sortBtn" value="sExByHeal">治疗</button>                 
+						<button name="sortBtn" value="sExByAP">多动</button>                   
+						<button name="sortBtn" value="sExByPurge">净化</button>                
+						<button name="sortBtn" value="sExByDispel">驱散</button>   
+						<br>
+						<button name="sortBtn" value="sExByLV">等级</button>    
+						<button name="sortBtn" value="sortByType">品质</button>						
+					</td>                                                                         
+				</tr>                                                                             
+		</table>                                                                                  
+	</div>                                                                                        
+
+	<script src='pop_mod_sortDeck.js' type='text/javascript' charset="utf-8"></script>
+ 	<link href="../css/common.css" rel="stylesheet" type="text/css"  charset="utf-8" />
+  </body>
+</html>
