@@ -1,4 +1,4 @@
-﻿console.log("load bg_conf.js");
+console.log("load bg_conf.js");
 /**************************全局变量区*******************************/
 /* 
 	"test":{
@@ -176,10 +176,10 @@
 		]
 	},
 	"mod_craftProcess":{
-		"mod":"合成商店卡片收集度",
+		"mod":"合成卡片收集度",
 		"modconf":{},
 		"dept":[],
-		"bg":[],//"/mod_craftProcess/bg_mod_craftProcess.js"
+		"bg":[],
 		"urlist":[
 				{	"url":"#/*",
 					"js":["/mod_craftProcess/csj_mod_craftProcess.js"],
@@ -191,6 +191,26 @@
 				},
 				{	"url":"#/city/classhall/id/*",
 					"js":["/mod_craftProcess/csj_mod_craftProcess_s.js"],
+					"pop":""
+				}
+		]
+	},
+	"mod_craftFocus":{
+		"mod":"合成商店卡片监控",
+		"modconf":{},
+		"dept":[],
+		"bg":[],
+		"urlist":[
+				{	"url":"#/*",
+					"js":["/mod_craftFocus/csj_mod_craftFocus.js"],
+					"pop":"监控卡片:/mod_craftFocus/pop_mod_craftFocus.html"
+				},
+				{	"url":"#/market/shop/id/*",
+					"js":["/mod_craftFocus/csj_mod_craftFocus_s.js"],
+					"pop":""
+				},
+				{	"url":"#/city/classhall/id/*",
+					"js":["/mod_craftFocus/csj_mod_craftFocus_s.js"],
 					"pop":""
 				}
 		]

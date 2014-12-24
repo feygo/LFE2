@@ -1,4 +1,4 @@
-﻿
+
 /** 后台通讯区 */
 var bg = chrome.extension.getBackgroundPage();   
 bg.log("popup load pop_mod_craftProcess.js");

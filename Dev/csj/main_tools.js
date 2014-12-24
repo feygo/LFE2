@@ -1,4 +1,4 @@
-﻿console.log("load main_tools.js");
+console.log("load main_tools.js");
 /**********************MOD模块使用全局函数 功能区***************************/
 var isDebug="1";
 function log(e){

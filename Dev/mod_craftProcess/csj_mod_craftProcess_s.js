@@ -1,6 +1,6 @@
 ﻿log("load csj_mod_craftProcess_s.js");
 
-// 更新不满足5张数量的卡片
+// 记录合成卡片的信息
 function saveCraftCardNum(card){
 	if(DB_CP_S==undefined){
 		Tool_getDB(DB_NAME_CP,[DB_OS_CP],update_DB_CP_S,function(evt){

@@ -55,6 +55,11 @@ function getShopCraft(shopId,frm){
 				saveCraftCardNum(cardData);
 			}
 			
+			// csj_mod_craftFocus_s.js文件中的卡片信息的记录函数
+			if(setFocusCardAction!=undefined){
+				setFocusCardAction(cardData);
+			}
+			
 			// 获取合成材料的信息
 			var itemList=drList[i].querySelectorAll(".reqlist a");
 			for(var j=0;j<itemList.length;j++){

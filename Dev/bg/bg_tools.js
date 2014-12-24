@@ -1,4 +1,4 @@
-﻿console.log("load bg_tools.js");
+console.log("load bg_tools.js");
 /**********************MOD模块使用全局函数 功能区***************************/
 function log(e){
 	console.log(e);
