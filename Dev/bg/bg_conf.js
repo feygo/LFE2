@@ -212,6 +212,10 @@ console.log("load bg_conf.js");
 				{	"url":"#/city/classhall/id/*",
 					"js":["/mod_craftFocus/csj_mod_craftFocus_s.js"],
 					"pop":""
+				},
+				{	"url":"#/character/card",
+					"js":["/mod_craftFocus/csj_mod_craftFocus_c.js"],
+					"pop":""
 				}
 		]
 	}

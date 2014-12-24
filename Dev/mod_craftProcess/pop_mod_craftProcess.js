@@ -318,6 +318,6 @@ var isD=true;
 
 window.addEventListener('load', loadPort);
 document.querySelector('#clsDiv').addEventListener('click', clsDiv);
-// document.querySelector('#focusBtn').addEventListener('click', doFocus);
+document.querySelector('#focusBtn').addEventListener('click', doFocus);
 
 bg.log("popup load pop_mod_craftProcess.js done");
