@@ -25,18 +25,30 @@ function loadFocusCard(port){
 		}
 	}
 }
-function addFocusCard(cf,port){
+function addFocusCard(cf){
 	var objectStore=DB_CF.transaction([DB_OS_CF], "readwrite").objectStore(DB_OS_CF);
 	var request = objectStore.put(cf);
 	request.onsuccess = function(evt) {
 		debug("添加监控卡片信息："+JSON.stringify(evt.target.result));
 	}
 }
-function delFocusCard(cardId,port){
+function delFocusCard(cardId){
 	var objectStore=DB_CF.transaction([DB_OS_CF], "readwrite").objectStore(DB_OS_CF);
 	var request = objectStore.delete(cardId);
 	request.onsuccess = function(evt) {
 		debug("删除监控卡片信息："+cardId);
+	}
+}
+function checkFocusCard(cardId,port){
+	var objectStore=DB_CF.transaction([DB_OS_CF], "readwrite").objectStore(DB_OS_CF);
+	var request = objectStore.get(cardId);
+	request.onsuccess = function(evt) {
+		debug("查找监控卡片信息："+cardId);
+		if(evt.target.result){			
+			port.postMessage({"cmd":"check.rs","data":true,"id":cardId});
+		}else{
+			port.postMessage({"cmd":"check.rs","data":false,"id":cardId});
+		}
 	}
 }
 /************************ 数据预备区 **********************/
@@ -60,9 +72,11 @@ function handlePort_modCraftFocus(port){
 			if (msg.cmd == "load"){
 				loadFocusCard(port);
 			}else if(msg.cmd == "add"){
-				addFocusCard(msg.data,port);
+				addFocusCard(msg.data);
 			}else if(msg.cmd == "del"){
-				delFocusCard(msg.id,port);
+				delFocusCard(msg.id);
+			}else if(msg.cmd == "check"){
+				checkFocusCard(msg.id,port);
 			}
 		});
 	}

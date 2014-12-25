@@ -1,11 +1,13 @@
-
+﻿
 /** 后台通讯区 */
 var bg = chrome.extension.getBackgroundPage();   
 bg.log("popup load pop_mod_craftProcess.js");
 /*********************** 页面通道 通讯区 *********************/
 var port;
+var tabId;
 function loadPort(){
 	chrome.tabs.getSelected(function(tab){
+		tabId=tab.id;
 		port = chrome.tabs.connect(tab.id,{name: "mod_craftProcess"});
 		loadCraftShopList();
 		
@@ -31,7 +33,13 @@ function loadPort(){
 			}
 		});
 		
-		
+		// 判断是否启动卡片监控功能
+		if(bg.MOD_NOW["mod_craftFocus"]){
+			bg.debug("启动Mod功能:合成商店卡片监控");
+			isModCraftFocus=true;
+		}else{
+			isModCraftFocus=false;
+		}
 	});
 }
 
@@ -97,10 +105,11 @@ function loadCraftShopList(){
 				cursor.continue();
 			}else{
 				// 页面展示
-				bg.debug("=========")
+				bg.debug("====合成商店列表====")
 				bg.debug(shopList);
+				bg.debug("====合成商店信息====")
 				bg.debug(shopCardRS);
-				bg.debug(shopCnt);
+				bg.debug("商店数量："+shopCnt);
 			}
 		}
 	})
@@ -189,14 +198,14 @@ function addCardTitle(sTable){
 	var tdT2=document.createElement("td");
 	tdT2.className='name c5';
 	tdT2.innerHTML="<b>现有卡片数量</b>";
-	if(isD){
+	if(isModCraftFocus){
 		var tdT3=document.createElement("td");
 		tdT3.className='name c5';
 		tdT3.innerHTML="<b>是否列为监控目标</b>";
 	}
 	trT.appendChild(tdT1);
 	trT.appendChild(tdT2);
-	if(isD){
+	if(isModCraftFocus){
 		trT.appendChild(tdT3);
 	}
 	sTable.appendChild(trT);
@@ -226,24 +235,26 @@ function showCardList(){
 		var tdTmp2=document.createElement("td");
 		tdTmp2.innerText=card.num;
 
-		if(isD){
+		if(isModCraftFocus){
 			var tdTmp3=document.createElement("td");
 			if(card.num!="5"){
-				// if(tmp.isFocus){
-					// tdTmp3.innerHTML="<input type=\"checkbox\" name=\"isFocus\" checked value=\""+cId+"\" />";
-				// }else{
-					tdTmp3.innerHTML="<input type=\"checkbox\" name=\"isFocus\" value=\""+cId+"\" />";
-				// }
+					tdTmp3.innerHTML="<input type=\"checkbox\" name=\""+card.cardName+"\" id=\""+cId+"\" value=\""+card.num+"\" />";
+					tdTmp3.querySelector('input').addEventListener('click', setFocusStatus);
+					// 核查监控卡片状态
+					var fsPort=getFocusPort();
+					fsPort.postMessage({"cmd":"check","id":cId});
 			}else{
 				tdTmp3.innerHTML="";
 			}
 		}
 		trTmp.appendChild(tdTmp1);
 		trTmp.appendChild(tdTmp2);
-		if(isD){
+		if(isModCraftFocus){
 			trTmp.appendChild(tdTmp3);
 		}
 		sTable.appendChild(trTmp);
+		
+		
 	}
 	
 	if(cnt<3){
@@ -259,12 +270,6 @@ function showCardList(){
 	// 结果区显示
 	var rs=document.getElementById('rsDiv');
 	rs.style.display="";
-	if(isD){
-		document.getElementById('focusBtn').style.display="";
-	}else{
-		document.getElementById('focusBtn').style.display="none";
-	}
-
 }
 
 /*************************** 卡片信息获取区 *******************/
@@ -298,26 +303,38 @@ function clsDiv(){
 　　objE.innerHTML = "";
 }
 /*************************** 监控卡片功能区 *******************/
-function doFocus(){
-	var chkList=document.getElementsByName('isFocus');
-	var sn=document.getElementById('nowShop').value;
-	var f={};
-	var c=[];
-	for(var i=0;i<chkList.length;i++){
-		if(chkList[i].checked){
-			c.push(chkList[i].value);
-		}
+var focusPort;
+function getFocusPort(){
+	if(focusPort){
+	}else{
+		focusPort = chrome.tabs.connect(tabId,{name: "mod_craftFocus"});
+		focusPort.onMessage.addListener(function(msg) {
+			bg.debug("收到"+focusPort.name+"通道消息："+JSON.stringify(msg));
+			if (msg.cmd == "check.rs"){
+				document.getElementById(msg.id).checked=msg.data;// true or false
+			}
+		});
 	}
-	f[sn]=c;
-	// bg.log(f);
-	saveFocus(f);
+	return focusPort;
+}
+function setFocusStatus(){
+	var fsPort=getFocusPort();
+	var b=event.srcElement;
+	if(b.checked){
+		var cf={"cardId":"","cardName":"","num":0};
+		cf["cardId"]=b.id;
+		cf["cardName"]=b.name;
+		cf["num"]=b.value;
+		fsPort.postMessage({"cmd":"add","data":cf,"id":b.id});
+	}else{
+		fsPort.postMessage({"cmd":"del","id":b.id});
+	}
 }
 /*************************** 权限控制区 *******************/
-var isD=true;
+var isModCraftFocus=false;
 /*************************** 绑定与自动执行区 *******************/
 
 window.addEventListener('load', loadPort);
 document.querySelector('#clsDiv').addEventListener('click', clsDiv);
-document.querySelector('#focusBtn').addEventListener('click', doFocus);
 
 bg.log("popup load pop_mod_craftProcess.js done");
