@@ -196,7 +196,7 @@ console.log("load bg_conf.js");
 		]
 	},
 	"mod_craftFocus":{
-		"mod":"合成商店卡片监控",
+		"mod":"合成卡片监控",
 		"modconf":{},
 		"dept":[],
 		"bg":[],
@@ -215,6 +215,22 @@ console.log("load bg_conf.js");
 				},
 				{	"url":"#/character/card",
 					"js":["/mod_craftFocus/csj_mod_craftFocus_c.js"],
+					"pop":""
+				}
+		]
+	},
+	"mod_craftFocusItem":{
+		"mod":"合成材料监控",
+		"modconf":{},
+		"dept":[],
+		"bg":[],
+		"urlist":[
+				{	"url":"#/*",
+					"js":["/mod_craftFocusItem/csj_mod_craftFocusItem.js"],
+					"pop":"监控材料:/mod_craftFocusItem/pop_mod_craftFocusItem.html"
+				},
+				{	"url":"#/character/inventory",
+					"js":["/mod_craftFocusItem/csj_mod_craftFocusItem_c.js"],
 					"pop":""
 				}
 		]
