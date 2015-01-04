@@ -20,7 +20,7 @@ function saveDeck(port){
 			rs.us=us;
 			rs.diList=diList;
 			var requestUpdate = objectStore.put(rs);
-			requestUpdate.onerror = function(event) {
+			requestUpdate.onerror = function(evt) {
 				debug("卡组更新出错:"+evt.target.error.message);
 			};	
 			requestUpdate.onsuccess = function(evt) {
@@ -30,7 +30,7 @@ function saveDeck(port){
 			}
 		}else{
 			var requestUpdate = objectStore.add(gearData);
-			requestUpdate.onerror = function(event) {
+			requestUpdate.onerror = function(evt) {
 				debug("卡组保存出错:"+evt.target.error.message);
 			};	
 			requestUpdate.onsuccess = function(evt) {

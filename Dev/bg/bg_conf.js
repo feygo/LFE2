@@ -219,10 +219,22 @@ console.log("load bg_conf.js");
 				}
 		]
 	},
+	"mod_invFocus":{
+		"mod":"背景材料监控",
+		"modconf":{},
+		"dept":[],
+		"bg":[],
+		"urlist":[
+				{	"url":"#/character/inventory",
+					"js":["/mod_invFocus/csj_mod_invFocus.js"],
+					"pop":""
+				}
+		]
+	},
 	"mod_craftFocusItem":{
 		"mod":"合成材料监控",
 		"modconf":{},
-		"dept":[],
+		"dept":["mod_craftFocus"],
 		"bg":[],
 		"urlist":[
 				{	"url":"#/*",
@@ -230,7 +242,7 @@ console.log("load bg_conf.js");
 					"pop":"监控材料:/mod_craftFocusItem/pop_mod_craftFocusItem.html"
 				},
 				{	"url":"#/character/inventory",
-					"js":["/mod_craftFocusItem/csj_mod_craftFocusItem_c.js"],
+					"js":["/mod_craftFocusItem/csj_mod_craftFocusItem_i.js"],
 					"pop":""
 				}
 		]

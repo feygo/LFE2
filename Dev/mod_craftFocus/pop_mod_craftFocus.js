@@ -109,6 +109,9 @@ function getCraftItem(cardId){
 function delFocusCard(){
 	var b=event.srcElement;
 	port.postMessage({"cmd":"del","id":b.value});
+	// 删除页面的tr
+	var table=document.getElementById("focusList");
+	table.removeChild(b.parentElement.parentElement);	
 }
 /*************************** 绑定与自动执行区 *******************/
 window.addEventListener('load', loadPort);
