@@ -4,7 +4,6 @@
 function getItemInfo(){
 	getNorItemInfo();
 	getLootItemInfo();
-	debug(ItemData);
 	for(itemId in ItemData){
 		var os=DB_IF.transaction([DB_OS_IF], "readwrite").objectStore(DB_OS_IF);
 		var requestUpdate=os.put(ItemData[itemId]);
@@ -57,49 +56,6 @@ function getLootItemInfo(){
 		setInfo(itemData,"lootNum");
 	}
 }
-// function getLootItemInfo(DB){
-	// var itemList=document.querySelectorAll("#looting_bag>div.realitem");
-	// debug("待拾取的物品数量："+itemList.length);
-	
-	// for(var i=0;i<itemList.length;i++){
-		// var item=itemList[i].querySelector("A.item.info");
-		// var itemId=item.id.replace("item","");
-		// debug(itemId);
-		// var objectStore=DB.transaction([DB_OS_IF], "readonly").objectStore(DB_OS_IF);
-		// var request = objectStore.get(itemId);
-		// request.onsuccess = function(evt) {
-			// var data=evt.currentTarget.result;
-			// debug(evt);
-			// debug(data);
-			// if(data){
-				// data.lootNum=itemData.lootNum;
-				// var os=DB.transaction([DB_OS_IF], "readwrite").objectStore(DB_OS_IF);
-				// var requestUpdate=os.put(data);
-				// requestUpdate.onerror = function(evt) {
-					// debug("物品更新出错:"+evt.target.error.message);
-				// };
-				// requestUpdate.onsuccess = function(evt) {
-					// debug("物品更新成功:"+evt.target.result);
-				// };
-			// }else{
-				// var itemData={"itemId":"","itemName":"","norNum:":0,"lootNum:":0}
-				// itemData["itemId"]=itemId;
-				// itemData["itemName"]=Tool_trim(item.innerText);
-				// var itemNumStr=document.querySelector("#looting_item_nownum"+itemId);
-				// itemData["lootNum"]=parseInt(itemNumStr.innerText);
-				
-				// var os=DB.transaction([DB_OS_IF], "readwrite").objectStore(DB_OS_IF);
-				// var requestUpdate=os.put(itemData);
-				// requestUpdate.onerror = function(evt) {
-					// debug("物品保存出错:"+evt.target.error.message);
-				// };
-				// requestUpdate.onsuccess = function(evt) {
-					// debug("物品保存成功:"+evt.target.result);
-				// };		
-			// }
-		// }
-	// }
-// }
 /************************ 数据预备区 **********************/
 var DB_OS_IF = USER_NAME+"#invFocus";
 var DB_NAME_IF = 'LFE2#Mod#invFocus';

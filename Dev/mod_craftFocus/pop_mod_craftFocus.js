@@ -14,6 +14,7 @@ function loadPort(){
 			if (msg.cmd == "load.rs"){
 				showFocusCardList(msg.data);
 				getCraftItem(msg.id);
+				getCardInfo(msg.id);
 			}
 		});
 	});
@@ -34,9 +35,12 @@ function addFocusTitle(rTable){
 	var tdT1=document.createElement("td");
 	tdT1.className='name c5';
 	tdT1.innerHTML="<b>监控卡片名称</b>";
+	var tdT11=document.createElement("td");
+	tdT11.className='name c5';
+	tdT11.innerHTML="<b>城市</b>";
 	var tdT2=document.createElement("td");
 	tdT2.className='name c5';
-	tdT2.innerHTML="<b>卡片数量</b>";
+	tdT2.innerHTML="<b>数量</b>";
 	var tdT3=document.createElement("td");
 	tdT3.className='name c5';
 	tdT3.innerHTML="<b>所需材料</b>";
@@ -45,6 +49,7 @@ function addFocusTitle(rTable){
 	tdT4.innerHTML="<b>操作</b>";
 	
 	trT.appendChild(tdT1);
+	trT.appendChild(tdT11);
 	trT.appendChild(tdT2);
 	trT.appendChild(tdT3);
 	trT.appendChild(tdT4);
@@ -58,18 +63,22 @@ function showFocusCardList(cf){
 	var tr1=document.createElement("tr");	
 	var td1=document.createElement("td");
 	td1.innerHTML=cf.cardName;
+	var td11=document.createElement("td");
+	td11.innerHTML="";
+	td11.id="city"+cf.cardId;
+	td11.className="city";
 	var td2=document.createElement("td");
 	td2.innerText=cf.num;
 	var td3=document.createElement("td");
 	td3.innerHTML="";
-	td3.id=cf.cardId;
+	td3.id="item"+cf.cardId;
 	td3.className="item";
-	td3.innerHTML="";
 	
 	var td4=document.createElement("td");
 	td4.innerHTML="<button name='D' value='"+cf.cardId+"'>del</button>";
 	
 	tr1.appendChild(td1);
+	tr1.appendChild(td11);
 	tr1.appendChild(td2);
 	tr1.appendChild(td3);
 	tr1.appendChild(td4);
@@ -86,18 +95,43 @@ function getCraftItem(cardId){
 	bg.Tool_getDB([bg.DB_OS_CRAFT_ITEM],function(evt){
 			var db = evt.currentTarget.result;
 			var txn=db.transaction([bg.DB_OS_CRAFT_ITEM], "readonly")
-			var os_shopAll=txn.objectStore(bg.DB_OS_CRAFT_ITEM);	
-			// 获取商店列表
-			var request = os_shopAll.index("cardId").openCursor(IDBKeyRange.only(cardId));
+			var os_craftItem=txn.objectStore(bg.DB_OS_CRAFT_ITEM);	
+			// 获取合成材料列表
+			var request = os_craftItem.index("cardId").openCursor(IDBKeyRange.only(cardId));
 			request.onsuccess = function(evt) {
 				var cursor = request.result;
 				if(cursor){
 					var item=cursor.value;
 					// 在监控卡片列表中写入材料信息
-					var str=document.getElementById(cardId).innerHTML;
+					var itemTD=document.getElementById("item"+cardId);
+					var str=itemTD.innerHTML;
 					str=str+"<label class='itemReq' id='"+item.itemId+"' name='"+item.cardId+"' value='"+item.reqNum+"' >"+item.itemName+"</label><br>";
-					document.getElementById(cardId).innerHTML=str;
+					itemTD.innerHTML=str;
 					// 在监控材料列表中写入材料信息					
+					cursor.continue();
+				}else{
+					db.close();
+				}
+			}
+		});
+}
+function getCardInfo(cardId){	
+	bg.Tool_getDB([bg.DB_OS_SHOP_CARD],function(evt){
+			var db = evt.currentTarget.result;
+			var txn=db.transaction([bg.DB_OS_SHOP_CARD], "readonly")
+			var os_shopCard=txn.objectStore(bg.DB_OS_SHOP_CARD);	
+			// 获取卡片信息列表
+			var request = os_shopCard.openCursor(IDBKeyRange.only(cardId));
+			request.onsuccess = function(evt) {
+				var cursor = request.result;
+				if(cursor){
+					var card=cursor.value;
+					// 在监控卡片列表中写入城市信息
+					var cityTD=document.getElementById("city"+cardId);
+					var str=cityTD.innerHTML;
+					str=str+card.cardCity+"<br>";
+					cityTD.innerHTML=str;
+					// 在监控材料列表中写入城市信息					
 					cursor.continue();
 				}else{
 					db.close();

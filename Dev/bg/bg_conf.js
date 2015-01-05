@@ -234,16 +234,12 @@ console.log("load bg_conf.js");
 	"mod_craftFocusItem":{
 		"mod":"合成材料监控",
 		"modconf":{},
-		"dept":["mod_craftFocus"],
+		"dept":["mod_craftFocus","mod_invFocus"],
 		"bg":[],
 		"urlist":[
 				{	"url":"#/*",
 					"js":["/mod_craftFocusItem/csj_mod_craftFocusItem.js"],
 					"pop":"监控材料:/mod_craftFocusItem/pop_mod_craftFocusItem.html"
-				},
-				{	"url":"#/character/inventory",
-					"js":["/mod_craftFocusItem/csj_mod_craftFocusItem_i.js"],
-					"pop":""
 				}
 		]
 	}
