@@ -114,6 +114,7 @@ function loadCraftShopList(){
 		}
 	})
 }
+// 添加商店页面title
 function addShopTitle(rTable){
 	var trT=document.createElement("tr");				
 	var tdT1=document.createElement("td");
@@ -134,6 +135,7 @@ function addShopTitle(rTable){
 	trT.appendChild(tdT4);
 	rTable.appendChild(trT);
 }
+// 添加商店页面 列表项
 function addShopTr(rTable,si,sn,sc,uc,cp){
 	var tr1=document.createElement("tr");	
 	var td1=document.createElement("td");
@@ -150,7 +152,10 @@ function addShopTr(rTable,si,sn,sc,uc,cp){
 	tr1.appendChild(td3);
 	tr1.appendChild(td4);
 	rTable.appendChild(tr1);
+	/*******************************绑定事件***********/
+	td1.querySelector('button').addEventListener('click', showCardList);
 }
+// 
 function showCraftShopList(){	
 	// 载入商店数量和合成卡片数量	
 	document.getElementById("sCnt").innerText=shopCnt;	
@@ -179,16 +184,13 @@ function showCraftShopList(){
 			}
 		}
 		var cp=sc_unt/sc_cnt*100
+		if(sc_cnt==0){
+			sc_cnt=-1;
+		}
 		addShopTr(rTable,shopId,shopNameInfo,sc_cnt,sc_unt,cp+"%");
 	}
-
-	/*******************************绑定事件***********/
-	var bl=document.getElementsByName('V');
-	for(var i=0;i<bl.length;i++){		
-		bl[i].addEventListener('click', showCardList);
-	}
 }
-
+// 添加商店卡片页面的title
 function addCardTitle(sTable){
 	// 组成table 表头
 	var trT=document.createElement("tr");				
@@ -210,7 +212,7 @@ function addCardTitle(sTable){
 	}
 	sTable.appendChild(trT);
 }
-//载入具体的商店信息
+// 添加商店卡片页面 列表项
 function showCardList(){
 	var shopId=window.event.srcElement.value;
 	// 商店的卡片列表，拥有该卡片的数量，是否列为监控目标
@@ -252,21 +254,10 @@ function showCardList(){
 		if(isModCraftFocus){
 			trTmp.appendChild(tdTmp3);
 		}
-		sTable.appendChild(trTmp);
-		
-		
-	}
-	
-	if(cnt<3){
-		sTable.style.height="100px";
-		sTable.style.overflowY='scroll';		
-	}
-	
-	/*******************************绑定事件***********/
-	var bl=document.getElementsByName('C');
-	for(var i=0;i<bl.length;i++){		
-		bl[i].addEventListener('click', getCardInfo);
-	}
+		sTable.appendChild(trTmp);	
+		/*******************************绑定事件***********/
+		tdTmp1.querySelector('button').addEventListener('click', getCardInfo);
+	}	
 	// 结果区显示
 	var rs=document.getElementById('rsDiv');
 	rs.style.display="";

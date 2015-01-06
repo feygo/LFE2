@@ -10,16 +10,11 @@ function getInvFocusItem(itemId,port){
 	requestUpdate.onsuccess = function(evt) {
 		var item=evt.target.result;
 		if(item){
-			var str="";
-			if(item.norNum){
-				str+=item.norNum+"+";
-			}
-			if(item.lootNum){
-				str+=item.lootNum;
-			}
-			port.postMessage({"cmd":"get.rs","id":itemId,"data":str});
+			port.postMessage({"cmd":"get.rs","id":itemId,"data":item});
 			debug("获得背包物品信息:"+JSON.stringify(item));
-		}		
+		}else{
+			port.postMessage({"cmd":"get.rs","id":itemId,"data":null});
+		}	
 	};
 }
 /********************** 通道消息 处理区**********************/
