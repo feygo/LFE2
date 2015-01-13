@@ -29,9 +29,21 @@ function loadPort(){
 				updateItemToCardStat(msg.id,itemNum);
 				// 更新卡片状态
 				checkCardStat();
+			}else if(msg.cmd == "getUserInv.rs"){
+				updateUserInv(msg.data);			
 			}
 		});
+		// 获取用户背包数量
+		loadUserInv();
 	});
+}
+// 载入用户背包数据
+function loadUserInv(){
+	port_cfi.postMessage({"cmd":"getUserInv"});
+}
+function updateUserInv(data){
+	document.getElementById("nNum").innerText=data.nNum;
+	document.getElementById("tNum").innerText=data.tNum;
 }
 // 载入监控卡片列表
 function loadFocusCard(){
@@ -147,43 +159,6 @@ function showCardList(cf){
 	tr1.appendChild(td3);
 	tr1.appendChild(td4);
 	rTable.appendChild(tr1);
-	
-	// 更新监控卡片数量
-	// var fcnt=document.getElementById("fcnt");
-	// var ncnt=parseInt(fcnt.innerText)+1;
-	// fcnt.innerText=ncnt;
-}
-function pickup(){
-	var b=event.srcElement;
-	var cardId=b.value;
-	var stat=document.getElementById("cardStat"+cardId);
-	// 可合成的卡片数量
-	var craftNum=parseInt(stat.dataset.craftNum);
-	if(craftNum==-1){
-		alert("材料不足，不要瞎点我");
-	}
-	// 每个卡片的材料总量
-	var iNum=0;
-	var itemList=stat.querySelectorAll("input");
-	for(var i=0;i<itemList.length;i++){
-		iNum+=parseInt(itemList[i].dataset.reqNum);
-	}
-	// 需要合成的卡片数量
-	var pNum=parseInt(document.getElementById("pickNum").value);
-	if(craftNum<pNum){
-		var iNumT=craftNum*iNum;
-		if(confirm("现有材料只能合成 "+craftNum+"张卡片，是否拾取"+iNumT+"物品？")){
-			bg.debug("A");
-		}
-	}else{
-		var iNumT=pNum*iNum;
-		if(confirm("是否要拾取合成 "+pNum+"张卡片所需的材料？"+iNumT)){
-			bg.debug("B");
-		}
-	}
-}
-function pickupAction(){
-
 }
 // 添加监控材料列表 卡片项
 function addItemList(item){
@@ -396,7 +371,84 @@ function getCraftItem(cardId){
 			}
 		});
 }
+/*************************** 材料拾取功能区 *******************/
+function pickup(){
+	var b=event.srcElement;
+	var cardId=b.value;
+	var stat=document.getElementById("cardStat"+cardId);
+	// 可合成的卡片数量
+	var craftNum=parseInt(stat.dataset.craftNum);
+	if(craftNum==-1){
+		alert("材料不足，不要瞎点我");
+		return;
+	}
+	// 获得用户背包数据
+	var nNum=parseInt(document.getElementById("nNum").innerText);
+	var tNum=parseInt(document.getElementById("tNum").innerText);
+	// 每个卡片的材料总量
+	var iNum=0;
+	var pickData={"cardNum":0,"itemList":[]};
+	var itemList=stat.querySelectorAll("input");
+	for(var i=0;i<itemList.length;i++){
+		var reqNum=parseInt(itemList[i].dataset.reqNum);
+		iNum+=reqNum;
+		pickData["itemList"].push({"itemId":itemList[i].name.replace("craftItem",""),"reqNum":reqNum});
+	}
+	// 需要合成的卡片数量
+	var pNum=parseInt(document.getElementById("pickNum").value);
+	if(craftNum<pNum){
+		// 如果拾取卡片 大于 可合成卡片数量，按可合成卡片数量计算
+		var iNumT=craftNum*iNum;
+		// 检查合成材料是否超出 背包数量
+		if((nNum+iNumT)>tNum){
+			alert("将要拾取"+iNumT+"个物品，超出了背包剩余空间，请重新选择将合成卡片数量");
+		}
+		if(confirm("现有材料只能合成 "+craftNum+"张卡片，是否拾取"+iNumT+"物品？")){
+			pickData["cardNum"]=craftNum;
+			pickupAction(pickData);
+		}
+	}else{
+		// 如果拾取卡片 小于 可合成卡片数量，按可合成卡片数量计算
+		var iNumT=pNum*iNum;
+		// 检查合成材料是否超出 背包数量
+		if((nNum+iNumT)>tNum){
+			alert("将要拾取"+iNumT+"个物品，超出了背包剩余空间，请重新选择将合成卡片数量");
+		}
+		if(confirm("是否要拾取合成 "+pNum+"张卡片所需的"+iNumT+"个材料？")){
+			pickData["cardNum"]=pNum;
+			pickupAction(pickData);
+		}
+	}
+}
+function pickupAction(data){
+	pickupItem("124",1);
+}
+	// :124 {success: false, msg: "未有足够的物品"}
+// :1
+/*************************** 卡片信息获取区 *******************/
+function pickupItem(itemId,lootNum) {	
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(data) {
+		if (xhr.readyState == 4) {
+		  if (xhr.status == 200) {
+			var res = JSON.parse(xhr.responseText);
+			// showCardInfo(id,res.text);
+			bg.debug(res);
+		  } else {
+			console.log(xhr);
+		  }
+		}
+	  }
+	var url ="http://www.linodas.com/json/item/action/loot_item";
+	var oForm = new FormData();
+	oForm.append("itemid", itemId);
+	oForm.append("lootnum", lootNum);	
+	xhr.open('POST', url, true);
+	xhr.send(oForm);
+};
+// function showCardInfo(id,txt){
 
+// }
 /*************************** 绑定与自动执行区 *******************/
 window.addEventListener('load', loadPort);
 

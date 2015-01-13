@@ -14,8 +14,11 @@ function getInvFocusItem(itemId,port){
 			debug("获得背包物品信息:"+JSON.stringify(item));
 		}else{
 			port.postMessage({"cmd":"get.rs","id":itemId,"data":null});
-		}	
+		}
 	};
+}
+function getUserInvAction(port){
+	port.postMessage({"cmd":"getUserInv.rs","data":USER_INV});
 }
 /********************** 通道消息 处理区**********************/
 function handlePort_modCraftFocusItem(port){	
@@ -24,7 +27,9 @@ function handlePort_modCraftFocusItem(port){
 			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "get"){
 				getInvFocusItem(msg.id,port);
-			}		
+			}else if (msg.cmd == "getUserInv"){
+				getUserInvAction(port);
+			}	
 		});
 	}
 }

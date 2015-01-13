@@ -183,7 +183,7 @@ function showCraftShopList(){
 				sc_unt++;
 			}
 		}
-		var cp=sc_unt/sc_cnt*100
+		var cp=Math.round(sc_unt/sc_cnt* 100) / 1.0 ;
 		if(sc_cnt==0){
 			sc_cnt=-1;
 		}

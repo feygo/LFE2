@@ -28,6 +28,20 @@ function getCityName(){
 	console.log("获取用户城市："+r);
 	return r;
 }
+var USER_INV=getUserInv();
+function getUserInv(){
+	var hn=document.getElementById("header_nav");
+	var r={};
+	if(hn){
+		r={"nNum":0,"tNum":0};
+		var bagA=hn.children[2].children[0];
+		var numB=bagA.querySelectorAll("b");
+		r.nNum=parseInt(numB[0].innerText);
+		r.tNum=parseInt(numB[1].innerText);
+	}
+	console.log("获取用户背包数据："+JSON.stringify(r));
+	return r;
+}
 var USER_LV=getUserLv();
 // 百目悟空 Lv.25
 function getUserLv(){
