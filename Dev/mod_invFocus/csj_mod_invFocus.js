@@ -1,59 +1,48 @@
 ﻿log("load csj_mod_invFocus.js");
 
 /*********************物品记录区*************************/
-function getItemInfo(){
-	getNorItemInfo();
-	getLootItemInfo();
-	for(itemId in ItemData){
-		var os=DB_IF.transaction([DB_OS_IF], "readwrite").objectStore(DB_OS_IF);
-		var requestUpdate=os.put(ItemData[itemId]);
+function loadItemList(){
+	var itemList=[];
+	var list=document.querySelectorAll("div.realitem A.item.info");
+	for(var i=0;i<list.length;i++){
+		var itemId=list[i].id.replace("item","");
+		var itemName=Tool_trim(list[i].innerText);
+		itemList.push({"itemId":itemId,"itemName":itemName});
+	}	
+	return itemList;
+}
+function storeItem(){
+	var itemList=loadItemList();
+	var os=DB_IF.transaction([DB_OS_IF], "readwrite").objectStore(DB_OS_IF);
+	// 清空现有数据
+	var clsReq=os.clear();
+	clsReq.onsuccess=function (evt){
+		debug("物品清空成功:"+evt);
+	}
+	clsReq.onerror=function(evt){
+		debug("物品清空出错:"+evt);
+	}
+	for(var i=0;i<itemList.length;i++){
+		var itemData={};
+		var itemId=itemList[i].itemId;
+		itemData["itemId"]=itemId;
+		itemData["itemName"]=itemList[i].itemName;
+		var lootNumStr=document.querySelector("#looting_item_nownum"+itemId);
+		if(lootNumStr){
+			itemData["lootNum"]=parseInt(lootNumStr.innerText);		
+		}
+		var norNumStr=document.querySelector("#item_nownum"+itemId);
+		if(norNumStr){
+			itemData["norNum"]=parseInt(norNumStr.innerText);		
+		}
+		// debug(itemData);
+		var requestUpdate=os.put(itemData);
 		requestUpdate.onerror = function(evt) {
 			debug("物品更新出错:"+evt.target.error.message);
 		};
 		requestUpdate.onsuccess = function(evt) {
 			debug("物品更新成功:"+evt.target.result);
 		};
-	}
-}
-var ItemData={};
-function setInfo(data,numStr){
-	if(ItemData[data.itemId]){
-		ItemData[data.itemId][numStr]=data[numStr];
-	}else{
-		ItemData[data.itemId]=data;
-	}
-}
-// 获取物品信息
-function getNorItemInfo(){
-	var itemList=document.querySelectorAll("#normal_bag>div.realitem");
-	debug("背包中的物品数量："+itemList.length);
-	for(var i=0;i<itemList.length;i++){
-		var item=itemList[i].querySelector("A.item.info");		
-		var itemId=item.id.replace("item","");
-		var itemData={}
-		itemData.itemId=itemId;
-		itemData.itemName=Tool_trim(item.innerText);
-		var itemNumStr=itemList[i].querySelector("#item_nownum"+itemId);
-		itemData.norNum=parseInt(itemNumStr.innerText);
-		// 保存数据
-		setInfo(itemData,"norNum");
-	}
-}
-function getLootItemInfo(){
-	var itemList=document.querySelectorAll("#looting_bag>div.realitem");
-	debug("待拾取的物品数量："+itemList.length);
-	
-	for(var i=0;i<itemList.length;i++){
-		var item=itemList[i].querySelector("A.item.info");
-		var itemId=item.id.replace("item","");
-		
-		var itemData={}
-		itemData["itemId"]=itemId;
-		itemData["itemName"]=Tool_trim(item.innerText);
-		var itemNumStr=itemList[i].querySelector("#looting_item_nownum"+itemId);
-		itemData["lootNum"]=parseInt(itemNumStr.innerText);
-		// 保存数据
-		setInfo(itemData,"lootNum");
 	}
 }
 /************************ 数据预备区 **********************/
@@ -68,7 +57,7 @@ function update_DB_IF(evt){
 }
 function success_DB_IF(evt){
 	DB_IF = evt.currentTarget.result;
-	getItemInfo();
+	storeItem();
 }
 /********************** 自动执行区**********************/
 function csjLoad_mod_invFocus(){

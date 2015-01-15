@@ -232,19 +232,25 @@ function setItemN(id,item){
 	var itemN=document.getElementById("itemN"+id);
 	var str="";
 	var itemNum=0;
+	var norNum=0;
+	var lootNum=0;
 	if(item!=null&&item.norNum){
 		str+=item.norNum+"+";
 		itemNum+=item.norNum;
+		norNum=item.norNum;
 	}else{
 		str+="0+";
 	}
 	if(item!=null&&item.lootNum){
 		str+=item.lootNum;
 		itemNum+=item.lootNum;
+		lootNum=item.lootNum;
 	}else{
 		str+="0";
 	}	
 	itemN.innerText=str;
+	itemN.dataset.norNum=norNum;
+	itemN.dataset.lootNum=lootNum;
 	itemN.dataset.num=itemNum;
 	// 更新物品的状态
 	var itemT=document.getElementById("itemT"+id);
@@ -382,60 +388,88 @@ function pickup(){
 		alert("材料不足，不要瞎点我");
 		return;
 	}
-	// 获得用户背包数据
-	var nNum=parseInt(document.getElementById("nNum").innerText);
-	var tNum=parseInt(document.getElementById("tNum").innerText);
 	// 每个卡片的材料总量
-	var iNum=0;
 	var pickData={"cardNum":0,"itemList":[]};
 	var itemList=stat.querySelectorAll("input");
 	for(var i=0;i<itemList.length;i++){
 		var reqNum=parseInt(itemList[i].dataset.reqNum);
-		iNum+=reqNum;
-		pickData["itemList"].push({"itemId":itemList[i].name.replace("craftItem",""),"reqNum":reqNum});
+		var itemId=itemList[i].name.replace("craftItem","");
+		var norNum=parseInt(document.querySelector("#itemList td#itemN"+itemId).dataset.norNum);
+		pickData["itemList"].push({"itemId":itemId,"reqNum":reqNum,"norNum":norNum});
 	}
 	// 需要合成的卡片数量
 	var pNum=parseInt(document.getElementById("pickNum").value);
-	if(craftNum<pNum){
-		// 如果拾取卡片 大于 可合成卡片数量，按可合成卡片数量计算
-		var iNumT=craftNum*iNum;
-		// 检查合成材料是否超出 背包数量
-		if((nNum+iNumT)>tNum){
-			alert("将要拾取"+iNumT+"个物品，超出了背包剩余空间，请重新选择将合成卡片数量");
-		}
-		if(confirm("现有材料只能合成 "+craftNum+"张卡片，是否拾取"+iNumT+"物品？")){
-			pickData["cardNum"]=craftNum;
-			pickupAction(pickData);
+	if(craftNum<pNum){		
+		if(confirm("现有材料只能合成 "+craftNum+"张卡片，是否拾取所需材料？")){
+			pickData["cardNum"]=craftNum;			
+		}else{
+			return;
 		}
 	}else{
-		// 如果拾取卡片 小于 可合成卡片数量，按可合成卡片数量计算
-		var iNumT=pNum*iNum;
-		// 检查合成材料是否超出 背包数量
-		if((nNum+iNumT)>tNum){
-			alert("将要拾取"+iNumT+"个物品，超出了背包剩余空间，请重新选择将合成卡片数量");
-		}
-		if(confirm("是否要拾取合成 "+pNum+"张卡片所需的"+iNumT+"个材料？")){
+		if(confirm("是否要拾取合成 "+pNum+"张卡片所需的材料？")){
 			pickData["cardNum"]=pNum;
-			pickupAction(pickData);
+		}else{
+			return;
 		}
 	}
+	if(checkInvNum(pickData)){
+		bg.debug("==拾取物品数据==");
+		bg.debug(pickData);
+		pickupAction(pickData);
+	}
 }
-function pickupAction(data){
-	pickupItem("124",1);
+function checkInvNum(pickData){
+	// 获得用户背包数据
+	var nNum=parseInt(document.getElementById("nNum").innerText);
+	var tNum=parseInt(document.getElementById("tNum").innerText);
+	var cardNum=pickData.cardNum;
+	var rNum=0;
+	// 计算拾取物品总数
+	for(var i=0;i<pickData.itemList.length;i++){
+		var item=pickData.itemList[i];
+		var loot=item.reqNum*cardNum-item.norNum;
+		if(loot<0){
+			loot=0;
+		}
+		rNum+=loot;
+		item["loot"]=loot;
+	}
+	// 检查合成材料是否超出 背包数量
+	if((nNum+rNum)>tNum){
+		alert("将要拾取"+rNum+"个物品，超出了背包剩余空间 \n请重新选择将合成卡片数量!!");
+		return false;
+	}else{
+		return true;
+	}
 }
-	// :124 {success: false, msg: "未有足够的物品"}
-// :1
-/*************************** 卡片信息获取区 *******************/
+function pickupAction(pickData){
+	// 清空拾取状态区
+	clsPickStat();
+	// 拾取物品
+	var list=pickData.itemList;
+	showPickStat({"success":true,"text":"开始拾取，拾取结束后请刷新^背包^页面以更新数据<br>"});
+	for(var i=0;i<list.length;i++){
+		if(list[i].loot>0){
+			pickupItem(list[i].itemId,list[i].loot);		
+		}else{
+			showPickStat({"success":true,"text":"物品需拾取0个"});
+		}
+	}
+	// 刷新表格
+	// loadFocusCard();
+}
 function pickupItem(itemId,lootNum) {	
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(data) {
 		if (xhr.readyState == 4) {
 		  if (xhr.status == 200) {
 			var res = JSON.parse(xhr.responseText);
-			// showCardInfo(id,res.text);
+			showPickStat(res);
 			bg.debug(res);
 		  } else {
-			console.log(xhr);
+			bg.debug("===========动态请求出现异常=============");
+			bg.debug(xhr);
+			alert("拾取物品功能出现异常！");			
 		  }
 		}
 	  }
@@ -446,9 +480,20 @@ function pickupItem(itemId,lootNum) {
 	xhr.open('POST', url, true);
 	xhr.send(oForm);
 };
-// function showCardInfo(id,txt){
-
-// }
+function showPickStat(res){
+	var stat=document.getElementById("pickStat");
+	var tmp=document.createElement("font");
+	tmp.innerHTML=res.text+";<br>";	
+	if(res.success){
+		tmp.color="green";
+	}else{
+		tmp.color="red";	
+	}
+	stat.appendChild(tmp);	
+}
+function clsPickStat(){
+	document.getElementById("pickStat").innerHTML="";
+}
 /*************************** 绑定与自动执行区 *******************/
 window.addEventListener('load', loadPort);
 
