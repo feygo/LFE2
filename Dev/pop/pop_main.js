@@ -21,6 +21,9 @@ chrome.tabs.getSelected(function(tab){
 			addTabButton(popStr[1],popStr[0]);
 		}
 	}
+	if(checkDevMode()=="1"){
+		showDevBtn();
+	}
 	
 });
 // 向导航框添加按钮
@@ -36,5 +39,12 @@ function addTabButton(value,name){
 function loadModPop(e){
 	top.location=e.srcElement.value;
 }
-
+// 维护页面显示控制
+function checkDevMode(){
+	return bg.EXT_CONF["devMode"];
+}
+function showDevBtn(){
+	document.getElementById("lfeDiv").style.display="";
+	document.getElementById("devBtn").addEventListener('click', loadModPop);
+}
 bg.log("load pop_main.js done");

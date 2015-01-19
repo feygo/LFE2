@@ -1,17 +1,4 @@
 ﻿console.log("load main-msg.js");
-// var port = chrome.extension.connect({name: "knockknock1"});
-// port.postMessage({joke: "Knock knock"});
-// console.log(port);
-// port.onMessage.addListener(function(msg) {
-	// console.log(msg);
-  // if (msg.question == "Who's there?")
-    // port.postMessage({answer: "Madame"});
-  // else if (msg.question == "Madame who?")
-    // port.postMessage({answer: "Madame... Bovary"});
-// });
-
-
-
 /**************************消息发送模块******************/
 // 消息规范：{"msg":{"type":"","info":info},"func":}
 function sendRequest(m){
@@ -32,4 +19,24 @@ function sendRequest(m){
 	});
 }
 
+/********************** 通道消息 处理区**********************/
+function handlePort_main(port){	
+	if(port.name == "LEF_MAIN"){
+		port.onMessage.addListener(function(msg) {
+			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+			if (msg.cmd == "clsData"){
+				clsData(msg.id,msg.data);
+			}	
+		});
+	}
+}
+function clsData(name,isAll){
+	if(isAll){
+		Tool_delDB(name);
+	}else{
+		Tool_delOS(name,"");
+	}
+}
+
+chrome.runtime.onConnect.addListener(handlePort_main);
 console.log("load main-msg.js done");

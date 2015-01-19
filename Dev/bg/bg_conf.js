@@ -45,7 +45,8 @@ console.log("load bg_conf.js");
 					"js":["/mod_note/csj_mod_note.js"],
 					"pop":"记事本:/mod_note/pop_mod_note.html"
 				}
-		]
+		],
+		"data":"LFE2#Mod#Note"
 	},
 	"mod_multDeck":{
 		"mod":"多卡组",
@@ -61,7 +62,8 @@ console.log("load bg_conf.js");
 					"js":["/mod_multDeck/csj_mod_multDeck.js"],
 					"pop":"多卡组:/mod_multDeck/pop_mod_multDeck.html"
 				}
-		]
+		],
+		"data":"LFE2#Mod#MultDeck"
 	},
 	"mod_sortDeck":{
 		"mod":"卡组排序",
@@ -77,7 +79,8 @@ console.log("load bg_conf.js");
 					"js":["/mod_sortDeck/csj_mod_sortDeck.js"],
 					"pop":"排序卡组:/mod_sortDeck/pop_mod_sortDeck.html"
 				}
-		]
+		],
+		"data":"LFE2#Mod#SortDeck"
 	},
 	"mod_gather":{
 		"mod":"自动采集",
@@ -89,7 +92,8 @@ console.log("load bg_conf.js");
 					"js":["/mod_gather/csj_mod_gather.js"],
 					"pop":"采集:/mod_gather/pop_mod_gather.html"
 				}
-		]
+		],
+		"data":"LFE2#Mod#Gather"
 	},
 	"mod_train":{
 		"mod":"自动训练",
@@ -103,7 +107,8 @@ console.log("load bg_conf.js");
 					"js":["/mod_train/csj_mod_train.js"],
 					"pop":"训练:/mod_train/pop_mod_train.html"
 				}
-		]
+		],
+		"data":"LFE2#Mod#Train"
 	},
 	"mod_cityInfoGet":{
 		"mod":"城市信息获取",
@@ -173,7 +178,8 @@ console.log("load bg_conf.js");
 					"pop":""
 				}
 				
-		]
+		],
+		"data":"LFE2#Mod#lessFiveCard"
 	},
 	"mod_craftProcess":{
 		"mod":"合成卡片收集度",
@@ -193,7 +199,8 @@ console.log("load bg_conf.js");
 					"js":["/mod_craftProcess/csj_mod_craftProcess_s.js"],
 					"pop":""
 				}
-		]
+		],
+		"data":"LFE2#Mod#craftProcess"
 	},
 	"mod_craftFocus":{
 		"mod":"合成卡片监控",
@@ -217,7 +224,8 @@ console.log("load bg_conf.js");
 					"js":["/mod_craftFocus/csj_mod_craftFocus_c.js"],
 					"pop":""
 				}
-		]
+		],
+		"data":"LFE2#Mod#craftFocus"
 	},
 	"mod_invFocus":{
 		"mod":"背景材料监控",
@@ -229,7 +237,8 @@ console.log("load bg_conf.js");
 					"js":["/mod_invFocus/csj_mod_invFocus.js"],
 					"pop":""
 				}
-		]
+		],
+		"data":"LFE2#Mod#invFocus"
 	},
 	"mod_craftFocusItem":{
 		"mod":"合成材料监控",
@@ -241,7 +250,8 @@ console.log("load bg_conf.js");
 					"js":["/mod_craftFocusItem/csj_mod_craftFocusItem.js"],
 					"pop":"监控材料:/mod_craftFocusItem/pop_mod_craftFocusItem.html"
 				}
-		]
+		],
+		"data":"LFE2#Mod#invFocus"
 	}
 }
 	// "mod_mapShow":{

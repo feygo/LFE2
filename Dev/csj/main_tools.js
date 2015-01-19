@@ -156,12 +156,33 @@ function Tool_getDB(DB_NAME,OS_List,updateFunc,succFunc) {
 }
 function Tool_delDB(DB_NAME){
 	window.indexedDB.deleteDatabase(DB_NAME);
+	debug("删除数据库："+DB_NAME);
 }
-
+function Tool_delOS(DB_NAME,DB_OS_NAME){
+	var verReq=window.indexedDB.open(DB_NAME);
+	debug("initDb "+DB_NAME);	
+	verReq.onsuccess = function (evt) {
+		var vdb = this.result;
+		if(vdb.objectStoreNames.contains(DB_OS_NAME)){
+			var newVer=vdb.version+1;
+			vdb.close();
+			var delReq=window.indexedDB.open(DB_NAME,newVer);
+			delReq.onupgradeneeded = function (evt) {		
+				evt.currentTarget.result.deleteObjectStore(DB_OS_NAME);
+				debug("删除数据对象："+DB_OS_NAME);
+			};
+			delReq.onsuccess = function (evt) {
+				evt.currentTarget.result.close();
+			}
+		}else{
+			debug("不存在该对象："+DB_OS_NAME);
+			vdb.close();
+		}		
+	}
+}
 /**********************自动载入区***************************/
 function loadMainTools(){
 	checkDevMode();
 }
 loadMainTools();
-
 console.log("load main_tools.js done");
