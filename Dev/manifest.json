@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Linodas Feygo Extension v2",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "The extension for Linodas by Feygo.",
 	
 	"options_page": "/option/options.html",
@@ -25,7 +25,7 @@
 	"content_scripts" : [
 		{
 		"matches" : [ "http://www.linodas.com/*" ],
-		"js" : [ "/csj/main_msg.js","/csj/main_tools.js","/csj/main.js" ],
+		"js" : [ "/csj/main_msg.js","/csj/main_tools.js","/csj/main_data.js","/csj/main.js" ],
 		"run_at" : "document_idle",
 		"all_frames" : false
 		}

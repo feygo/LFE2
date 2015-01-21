@@ -48,22 +48,12 @@ function saveLessFiveByShopEx(card){
 	}
 }
 /************************ 数据预备区 **********************/
-// {"rs":"","wp":"","zd":"","jn":"","note":"陌上开花缓缓归。"},
 var DB_OS_LFC = USER_NAME+"#lessFiveCard";
 var DB_NAME_LFC = 'LFE2#Mod#lessFiveCard';
 
 var DB_LFC_S;
 
-function update_DB_LFC_S(evt){
-	evt.currentTarget.result.createObjectStore(DB_OS_LFC, { keyPath: "cardId" });
-}
-
 function success_DB_LFC_S(evt){
 	DB_LFC_S = evt.currentTarget.result;
 }
-// /********************** 自动执行区**********************/
-// function csjLoad_mod_lessFiveCard_s(){
-	// Tool_getDB(DB_NAME_LFC,[DB_OS_LFC],update_DB_LFC_S,success_DB_LFC_S);
-// }
-// csjLoad_mod_lessFiveCard_s();
 log("load csj_mod_lessFiveCard_s.js done");

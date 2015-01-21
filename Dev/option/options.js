@@ -1,4 +1,7 @@
 // Saves options to localStorage.
+/*******************************************/
+var bg = chrome.extension.getBackgroundPage();  
+
 /**
 Object {mod_ad: "0", mod_multDeck: "0", mod_sortDeck: "1", mod_gather: "0", mod_train: "1"} 
 Object {training_lvLow: "5", training_lvUp: "4"} 
@@ -101,28 +104,48 @@ function extionReload(){
 	var win=chrome.extension.getBackgroundPage();
 	win.location.reload();
 }
-
+// 删除后台数据对象
 function del_dataObj(e){
-	var osName=window.event.srcElement.value;
-	var bg = chrome.extension.getBackgroundPage();  
+	var osName=window.event.srcElement.value;	
 	bg.Tool_delOS(bg[osName]);
-	// console.debug("删除数据对象："+osName);
 }
+// 清空后台数据对象
 function cls_dataObj(e){
 	var osName=window.event.srcElement.value;
-	var bg = chrome.extension.getBackgroundPage();  
 	bg.Tool_clsOS(bg[osName]);
-	// console.debug("清空数据对象："+osName);
+}
+// 设置全部mod选项的状态
+function setAllModStat(value){
+	var modList=document.querySelectorAll("input.mod");
+	for(var i=0;i<modList.length;i++){
+		rChecked(modList[i].name,value);	
+	}
+}
+function setAllModChecked(){
+	setAllModStat("1");
+}
+function setAllModUnChecked(){
+	setAllModStat("0");
 }
 
-document.querySelector('#savebtn').addEventListener('click', save_options);
-document.addEventListener("DOMContentLoaded",restore_options);
-
-var delList=document.getElementsByName("delObj");
-for(var i=0;i<delList.length;i++){
-	delList[i].addEventListener('click', del_dataObj);
-}
-var clsList=document.getElementsByName("clsObj");
-for(var i=0;i<clsList.length;i++){
-	clsList[i].addEventListener('click', cls_dataObj);
+/*******************页面载入区**************************/
+document.addEventListener("DOMContentLoaded",loadOption);
+// 页面载入入口
+function loadOption(){
+	// 恢复所有选项值
+	restore_options();
+	// 绑定save按钮事件
+	document.querySelector('#savebtn').addEventListener('click', save_options);
+	// 绑定bg存储对象按钮事件
+	var delList=document.getElementsByName("delObj");
+	for(var i=0;i<delList.length;i++){
+		delList[i].addEventListener('click', del_dataObj);
+	}
+	var clsList=document.getElementsByName("clsObj");
+	for(var i=0;i<clsList.length;i++){
+		clsList[i].addEventListener('click', cls_dataObj);
+	}
+	// 绑定全部mod启用停用事件
+	document.getElementById("setChecked").addEventListener('click', setAllModChecked);
+	document.getElementById("setUnChecked").addEventListener('click', setAllModUnChecked);
 }

@@ -454,24 +454,20 @@ function doSortDeckEx(data){
 /***********************************多卡排序  功能区  结束******************************************/
 
 /************************ 数据预备区 **********************/
-const DB_OS_Sort = USER_NAME+"#sort";
+var DB_OS_Sort;
 // {"key":DB_OS_SortConf,"value":}
 const Key_SortVer="SortVer";
 const Key_LocalCard="LocalCard";
-const DB_OS_SortConf = USER_NAME+"#sortConf";
-const DB_NAME_SortDeck = 'LFE2#Mod#SortDeck';
+var DB_OS_SortConf;
 
 var DB_SortDeck;
-// 数据结构更新 函数
-function update_DB_SortDeck(evt){
-	evt.currentTarget.result.createObjectStore(DB_OS_Sort, { keyPath: "id" });
-	evt.currentTarget.result.createObjectStore(DB_OS_SortConf, { keyPath: "key" });
-}
-
 // 数据库连接之后 自动执行的函数
-function success_DB_SortDeck(evt){
+function success_DB_SortDeck(db){
+	// 变量赋值
+	DB_OS_Sort = DC[SDECK_N].userOS[0];
+	DB_OS_SortConf = DC[SDECK_N].userOS[1];
 	// 检查引擎版本
-	DB_SortDeck=evt.currentTarget.result;
+	DB_SortDeck=db;
 	var trans=DB_SortDeck.transaction([DB_OS_SortConf,DB_OS_Sort], "readwrite");
 	var OS_SortConf=trans.objectStore(DB_OS_SortConf);
     var request = OS_SortConf.get(Key_SortVer);
@@ -632,7 +628,7 @@ function updateCardList(){
 "cmd":"sortDeck","id":slt.value
 **/
 function handlePort_modSortDeck(port){	
-	if(port.name == "mod_sortDeck"){
+	if(port.name == SDECK_N){
 		port.onMessage.addListener(function(msg) {
 			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "sortDeck"){
@@ -642,12 +638,10 @@ function handlePort_modSortDeck(port){
 	}
 }
 /********************** 自动执行区**********************/
+var SDECK_N="mod_sortDeck";
 function csjLoad_mod_sortDeck(){
 	chrome.runtime.onConnect.addListener(handlePort_modSortDeck);
-	Tool_getDB(DB_NAME_SortDeck,[DB_OS_Sort,DB_OS_SortConf],update_DB_SortDeck,success_DB_SortDeck);
+	Tool_connModDB(SDECK_N,success_DB_SortDeck);
 }
 csjLoad_mod_sortDeck();
-// Tool_delDB(DB_NAME_SortDeck);
-
-
 log("load csj_mod_sortDeck.js done");

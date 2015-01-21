@@ -174,7 +174,7 @@ function AfterGA(type,res){
 		}
 		// log(R);
 		//存储采集结果
-		DB_GA.transaction([DB_OS_GARS], "readwrite").objectStore(DB_OS_GARS).add(R);
+		DB_GA.transaction([DC[GA_N].userOS], "readwrite").objectStore(DC[GA_N].userOS).add(R);
 		//判断是否继续运行		
 		// 5.1、执行次数到达
 		tmpRunCnt++;
@@ -198,12 +198,12 @@ function AfterGA(type,res){
 	}else{
 		// 存储采集结果
 		var rl={"rs":"","wp":"","zd":"","jn":"","note":"异常："+res.msg};		
-		var reqAdd2 = DB_GA.transaction([DB_OS_GARS], "readwrite").objectStore(DB_OS_GARS).add(rl);
+		var reqAdd2 = DB_GA.transaction([DC[GA_N].userOS], "readwrite").objectStore(DC[GA_N].userOS).add(rl);
 		reqAdd2.onsuccess=function(evt){
 			debug(evt);
 		}		
 		alert('百目说："出现了某种神秘异常！"');
-		debug(res);
+		error(res);
 	}
 }
 // 解析反馈语句
@@ -267,7 +267,7 @@ function loadGA(port){
 	R["ap"]=getAP();
 	//读取战斗结果	
 	var garsList=[];
-	var objectStore = DB_GA.transaction([DB_OS_GARS], "readonly").objectStore(DB_OS_GARS);
+	var objectStore = DB_GA.transaction([DC[GA_N].userOS], "readonly").objectStore(DC[GA_N].userOS);
 	objectStore.openCursor().onsuccess = function(event) {
 		var cursor = event.target.result;
 		if (cursor) {
@@ -294,7 +294,7 @@ function beginGA(data){
 			FailCnt=data.failNum;
 			tmpRunCnt=0;
 			tmpFailCnt=0;
-			var reqClear = DB_GA.transaction([DB_OS_GARS], "readwrite").objectStore(DB_OS_GARS).clear();
+			var reqClear = DB_GA.transaction([DC[GA_N].userOS], "readwrite").objectStore(DC[GA_N].userOS).clear();
 			reqClear.onsuccess=function(evt){
 				doGA(data.gaType,AfterGA);
 			}			
@@ -305,22 +305,13 @@ function beginGA(data){
 }
 
 /************************ 数据预备区 **********************/
-// {"rs":"","wp":"","zd":"","jn":"","note":"陌上开花缓缓归。"},
-const DB_OS_GARS = USER_NAME+"#gars";
-const DB_NAME_GA = 'LFE2#Mod#Gather';
-
 var DB_GA;
-
-function update_DB_GA(evt){
-	evt.currentTarget.result.createObjectStore(DB_OS_GARS, { autoIncrement: true });
-}
-
-function success_DB_GA(evt){
-	DB_GA = evt.currentTarget.result;
+function success_DB_GA(db){
+	DB_GA = db;
 }
 /********************** 通道消息 处理区**********************/
 function handlePort_modGA(port){	
-	if(port.name == "mod_gather"){
+	if(port.name == GA_N){
 		port.onMessage.addListener(function(msg) {
 			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "load"){
@@ -333,11 +324,11 @@ function handlePort_modGA(port){
 }
 
 /********************** 自动执行区**********************/
+var GA_N="mod_gather";
 function csjLoad_mod_ga(){
 	chrome.runtime.onConnect.addListener(handlePort_modGA);
-	Tool_getDB(DB_NAME_GA,[DB_OS_GARS],update_DB_GA,success_DB_GA);
+	Tool_connModDB(GA_N,success_DB_GA);
 }
 csjLoad_mod_ga();
-// Tool_delDB(DB_NAME_GA);
 
 log("load csj_mod_gather.js done");

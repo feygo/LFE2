@@ -4,12 +4,16 @@ var isDebug="1";
 function log(e){
 	console.log(e);
 }
+function error(e){
+	console.error(e);
+}
 //debug 应是模块使用的函数
 function debug(e){
 	if(isDebug=="1"){
 		console.debug(e);
 	}		
 }
+
 function checkDevMode(){
 	var msg={"msg":{"type":"bg_conf","cmd":"isDebug","data":"","id":""},
 			"func":function(msg){
@@ -109,76 +113,6 @@ function Tool_getCardByOutframe(cardData,ofrm){
 		if(cardData.lv!=undefined){cardData.lv=tmpS[0].replace("等级: ","");}		
 	}	
 	return cardData;
-}
-/**********************indexedb 功能区***************************/
-function Tool_getDB(DB_NAME,OS_List,updateFunc,succFunc) {
-	if (!window.indexedDB) {
-		alert("你的浏览器不支持IndexedDB，插件数据无法保存，请更新最新的chrome浏览器！")
-	}
-	debug("initDb "+DB_NAME+"...");
-	var req = window.indexedDB.open(DB_NAME);
-	req.onsuccess = function (evt) {
-		var DB = this.result;
-		// log(DB);
-		// log(OS);
-		var isUpdate=false;
-		for(var i=0;i<OS_List.length;i++){
-			if(!DB.objectStoreNames.contains(OS_List[i])){
-				debug(OS_List[i]);
-				isUpdate=true;
-			}			
-		}
-		if(isUpdate){
-			var newVer=DB.version+1;
-			DB.close();
-			var newreq=window.indexedDB.open(DB_NAME,newVer);
-			debug("initDb "+DB_NAME+" update version:"+newVer);	
-			newreq.onupgradeneeded = function (evt) {		
-				updateFunc(evt);
-				debug("initDb.onupgradeneeded");
-			};
-			newreq.onsuccess = function (evt) {
-				DB = this.result;
-				debug("initDb new "+DB_NAME+" DONE");
-				succFunc(evt);
-			}
-			newreq.onerror = function (evt) {
-				debug("initDb new error:"+evt.target.error.message);
-			};
-		}
-		debug("initDb "+DB_NAME+" DONE");		
-		succFunc(evt);
-	};
-	req.onerror = function (evt) {
-		debug("initDb:"+evt.target.error.message);
-	};
-
-}
-function Tool_delDB(DB_NAME){
-	window.indexedDB.deleteDatabase(DB_NAME);
-	debug("删除数据库："+DB_NAME);
-}
-function Tool_delOS(DB_NAME,DB_OS_NAME){
-	var verReq=window.indexedDB.open(DB_NAME);
-	debug("initDb "+DB_NAME);	
-	verReq.onsuccess = function (evt) {
-		var vdb = this.result;
-		if(vdb.objectStoreNames.contains(DB_OS_NAME)){
-			var newVer=vdb.version+1;
-			vdb.close();
-			var delReq=window.indexedDB.open(DB_NAME,newVer);
-			delReq.onupgradeneeded = function (evt) {		
-				evt.currentTarget.result.deleteObjectStore(DB_OS_NAME);
-				debug("删除数据对象："+DB_OS_NAME);
-			};
-			delReq.onsuccess = function (evt) {
-				evt.currentTarget.result.close();
-			}
-		}else{
-			debug("不存在该对象："+DB_OS_NAME);
-			vdb.close();
-		}		
-	}
 }
 /**********************自动载入区***************************/
 function loadMainTools(){

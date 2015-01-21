@@ -11,38 +11,13 @@ function saveDeck(port){
 	// 组装成数据对象
 	var gearData={"gearName":gn,"userCost":uc,"userSpi":us,"deckInfo":diList};
 	// 存储卡组到db
-	var objectStore=DB_MultDeck.transaction([DB_OS_Gear], "readwrite").objectStore(DB_OS_Gear);
-    var request = objectStore.get(gn);
-	request.onsuccess = function(evt) {
-		var rs = request.result;
-		if(rs){
-			rs.uc=uc;
-			rs.us=us;
-			rs.diList=diList;
-			var requestUpdate = objectStore.put(rs);
-			requestUpdate.onerror = function(evt) {
-				debug("卡组更新出错:"+evt.target.error.message);
-			};	
-			requestUpdate.onsuccess = function(evt) {
-				var msg="卡组更新成功:"+rs.gearName;
-				debug(msg);
-				port.postMessage({"cmd":"rs","data":msg});
-			}
-		}else{
-			var requestUpdate = objectStore.add(gearData);
-			requestUpdate.onerror = function(evt) {
-				debug("卡组保存出错:"+evt.target.error.message);
-			};	
-			requestUpdate.onsuccess = function(evt) {
-				var msg="卡组保持成功:"+gearData.gearName;
-				debug(msg);
-				port.postMessage({"cmd":"rs","data":msg});
-			}
-		}
-		
-	};
-	request.onerror =function(evt){
-		var msg="卡组读取出错:"+evt.target.error.message;
+	var objectStore=DB_MultDeck.transaction([DC[MDECK_N].userOS], "readwrite").objectStore(DC[MDECK_N].userOS);
+	var requestUpdate = objectStore.put(gearData);
+	requestUpdate.onerror = function(evt) {
+		error("卡组保存出错:"+evt.target.error.message);
+	};	
+	requestUpdate.onsuccess = function(evt) {
+		var msg="卡组保存成功:"+gearData.gearName;
 		debug(msg);
 		port.postMessage({"cmd":"rs","data":msg});
 	}
@@ -50,8 +25,8 @@ function saveDeck(port){
 // 载入卡组
 function loadDeck(gn,port){
 	// 从db中读取卡组信息
-	var request = DB_MultDeck.transaction([DB_OS_Gear], "readonly")
-                .objectStore(DB_OS_Gear)
+	var request = DB_MultDeck.transaction([DC[MDECK_N].userOS], "readonly")
+                .objectStore(DC[MDECK_N].userOS)
                 .get(gn);
 	request.onsuccess = function(evt) {	
 		var gearData=evt.currentTarget.result;
@@ -67,15 +42,15 @@ function loadDeck(gn,port){
 	};
 	request.onerror =function(evt){
 		var msg="卡组载入出错:"+evt.target.error.message;
-		debug(msg);
+		error(msg);
 		port.postMessage({"cmd":"rs","data":msg});
 	}
 }
 // 删除卡组信息
 function delDeck(gn,port){
 	// 从db中读取卡组信息
-	var request = DB_MultDeck.transaction([DB_OS_Gear], "readwrite")
-                .objectStore(DB_OS_Gear)
+	var request = DB_MultDeck.transaction([DC[MDECK_N].userOS], "readwrite")
+                .objectStore(DC[MDECK_N].userOS)
                 .delete(gn);
 	request.onsuccess = function(evt) {	
 		var msg="卡组删除成功:"+gn;
@@ -84,14 +59,14 @@ function delDeck(gn,port){
 	};
 	request.onerror =function(evt){
 		var msg="卡组删除出错:"+evt.target.error.message;
-		debug(msg);
+		error(msg);
 		port.postMessage({"cmd":"rs","data":msg});
 	}
 }
 // 卡组列表载入
 function loadList(port){
 	var gnList=[];
-	var objectStore = DB_MultDeck.transaction(DB_OS_Gear).objectStore(DB_OS_Gear);
+	var objectStore = DB_MultDeck.transaction(DC[MDECK_N].userOS).objectStore(DC[MDECK_N].userOS);
 	objectStore.openCursor().onsuccess = function(event) {
 		var cursor = event.target.result;
 		if (cursor) {
@@ -104,25 +79,11 @@ function loadList(port){
 	};
 	objectStore.openCursor().onerror =function(evt){
 		var msg="卡组列表读取出错:"+evt.target.error.message;
-		debug(msg);
+		error(msg);
 		port.postMessage({"cmd":"loadList.rs","data":msg});
 	}
 }
 
-
-/************************ 数据预备区 **********************/
-const DB_OS_Gear = USER_NAME+"#gear";
-const DB_NAME_MultDeck = 'LFE2#Mod#MultDeck';
-
-var DB_MultDeck;
-
-function update_DB_MultDeck(evt){
-	evt.currentTarget.result.createObjectStore(DB_OS_Gear, { keyPath: "gearName" });
-}
-
-function success_DB_MultDeck(evt){
-	DB_MultDeck = evt.currentTarget.result;
-}
 /************************ 界面操作功能区 **********************/
 function getGearName(){
 	var gr=document.getElementsByName("gear_rename");
@@ -204,13 +165,17 @@ function setDeckInfo(cList){
 	
 }
 /***********************************多卡组  功能区  结束******************************************/
-
+/************************ 数据预备区 **********************/
+var DB_MultDeck;
+function success_DB_MultDeck(db){
+	DB_MultDeck = db;
+}
 /********************** 通道消息 处理区**********************/
 /**
 "cmd":"loadDeck","data":slt.value
 **/
 function handlePort_modMultDeck(port){	
-	if(port.name == "mod_multDeck"){
+	if(port.name == MDECK_N){
 		port.onMessage.addListener(function(msg) {
 			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "saveDeck"){
@@ -226,11 +191,11 @@ function handlePort_modMultDeck(port){
 	}
 }
 /********************** 自动执行区**********************/
+var MDECK_N="mod_multDeck";
 function csjLoad_mod_multDeck(){
 	chrome.runtime.onConnect.addListener(handlePort_modMultDeck);
-	Tool_getDB(DB_NAME_MultDeck,[DB_OS_Gear],update_DB_MultDeck,success_DB_MultDeck);
+	Tool_connModDB(MDECK_N,success_DB_MultDeck);
 }
 csjLoad_mod_multDeck();
-// Tool_delDB(DB_NAME_MultDeck);
 
 log("load csj_mod_multDeck.js done");

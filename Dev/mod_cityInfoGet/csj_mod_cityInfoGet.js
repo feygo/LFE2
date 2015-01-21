@@ -20,7 +20,6 @@ function getPVPstat(){
 	}
 }
 
-
 /********************** 自动执行区**********************/
 function csjLoad_mod_cig(){
 	getPVPstat();

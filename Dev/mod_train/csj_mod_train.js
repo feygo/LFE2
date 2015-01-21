@@ -11,7 +11,6 @@ var tmpFailCnt=0;
 
 var isRuning=false;
 
-
 /*******************************信息获取区**************************************/
 /** 获取怪物列表 
 {"mob":mobname,"lv":""}
@@ -313,22 +312,15 @@ function beginTrn(data){
 // doTraining(54915,9010,AfterTraining);
 
 /************************ 数据预备区 **********************/
-// {"rs":"","jq":"","jy":"","jn":"","note":""};
-const DB_OS_TRNRS = USER_NAME+"#trnrs";
-const DB_NAME_TRN = 'LFE2#Mod#Train';
-
+var DB_OS_TRNRS;
 var DB_TRN;
-
-function update_DB_TRN(evt){
-	evt.currentTarget.result.createObjectStore(DB_OS_TRNRS, { autoIncrement: true });
-}
-
-function success_DB_TRN(evt){
-	DB_TRN = evt.currentTarget.result;
+function success_DB_TRN(db){
+	DB_OS_TRNRS = DC[TRN_N].userOS;
+	DB_TRN = db;
 }
 /********************** 通道消息 处理区**********************/
 function handlePort_modTrn(port){	
-	if(port.name == "mod_train"){
+	if(port.name == TRN_N){
 		port.onMessage.addListener(function(msg) {
 			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "load"){
@@ -340,12 +332,11 @@ function handlePort_modTrn(port){
 	}
 }
 /********************** 自动执行区**********************/
+var TRN_N="mod_train";
 function csjLoad_mod_trn(){
 	chrome.runtime.onConnect.addListener(handlePort_modTrn);
-	Tool_getDB(DB_NAME_TRN,[DB_OS_TRNRS],update_DB_TRN,success_DB_TRN);
+	Tool_connModDB(TRN_N,success_DB_TRN);
 }
 csjLoad_mod_trn();
-// Tool_delDB(DB_NAME_TRN);
-
 
 log("c-training.js is done");

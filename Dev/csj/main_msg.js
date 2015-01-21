@@ -34,6 +34,7 @@ function clsData(name,isAll){
 	if(isAll){
 		Tool_delDB(name);
 	}else{
+	////////////////////////////////////////////////////////////////////
 		Tool_delOS(name,"");
 	}
 }
