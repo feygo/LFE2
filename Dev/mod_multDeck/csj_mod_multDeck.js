@@ -11,7 +11,7 @@ function saveDeck(port){
 	// 组装成数据对象
 	var gearData={"gearName":gn,"userCost":uc,"userSpi":us,"deckInfo":diList};
 	// 存储卡组到db
-	var objectStore=DB_MultDeck.transaction([DC[MDECK_N].userOS], "readwrite").objectStore(DC[MDECK_N].userOS);
+	var objectStore=DB_MultDeck.transaction([DB_OS_Gear], "readwrite").objectStore(DB_OS_Gear);
 	var requestUpdate = objectStore.put(gearData);
 	requestUpdate.onerror = function(evt) {
 		error("卡组保存出错:"+evt.target.error.message);
@@ -25,8 +25,8 @@ function saveDeck(port){
 // 载入卡组
 function loadDeck(gn,port){
 	// 从db中读取卡组信息
-	var request = DB_MultDeck.transaction([DC[MDECK_N].userOS], "readonly")
-                .objectStore(DC[MDECK_N].userOS)
+	var request = DB_MultDeck.transaction([DB_OS_Gear], "readonly")
+                .objectStore(DB_OS_Gear)
                 .get(gn);
 	request.onsuccess = function(evt) {	
 		var gearData=evt.currentTarget.result;
@@ -49,8 +49,8 @@ function loadDeck(gn,port){
 // 删除卡组信息
 function delDeck(gn,port){
 	// 从db中读取卡组信息
-	var request = DB_MultDeck.transaction([DC[MDECK_N].userOS], "readwrite")
-                .objectStore(DC[MDECK_N].userOS)
+	var request = DB_MultDeck.transaction([DB_OS_Gear], "readwrite")
+                .objectStore(DB_OS_Gear)
                 .delete(gn);
 	request.onsuccess = function(evt) {	
 		var msg="卡组删除成功:"+gn;
@@ -66,7 +66,7 @@ function delDeck(gn,port){
 // 卡组列表载入
 function loadList(port){
 	var gnList=[];
-	var objectStore = DB_MultDeck.transaction(DC[MDECK_N].userOS).objectStore(DC[MDECK_N].userOS);
+	var objectStore = DB_MultDeck.transaction(DB_OS_Gear).objectStore(DB_OS_Gear);
 	objectStore.openCursor().onsuccess = function(event) {
 		var cursor = event.target.result;
 		if (cursor) {
@@ -166,8 +166,10 @@ function setDeckInfo(cList){
 }
 /***********************************多卡组  功能区  结束******************************************/
 /************************ 数据预备区 **********************/
+var DB_OS_Gear;
 var DB_MultDeck;
 function success_DB_MultDeck(db){
+	DB_OS_Gear = DC[MDECK_N].userOS;
 	DB_MultDeck = db;
 }
 /********************** 通道消息 处理区**********************/

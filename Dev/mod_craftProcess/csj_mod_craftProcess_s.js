@@ -3,8 +3,9 @@
 // 记录合成卡片的信息
 function saveCraftCardNum(card){
 	if(DB_CP_S==undefined){
-		Tool_getDB(DB_NAME_CP,[DB_OS_CP],update_DB_CP_S,function(evt){
-			success_DB_CP_S(evt);
+		Tool_connModDB(CP_N,function(db){
+			DB_CP_S = db;
+			DB_OS_CP = DC[CP_N].userOS;
 			saveCraftCardNumEx(card);
 		});
 	}else{
@@ -32,18 +33,7 @@ function saveCraftCardNumEx(card){
 	}
 }
 /************************ 数据预备区 **********************/
-var DB_OS_CP = USER_NAME+"#craftProcess";
-var DB_NAME_CP = 'LFE2#Mod#craftProcess';
-
+var DB_OS_CP;
 var DB_CP_S;
-
-function update_DB_CP_S(evt){
-	// {"craftId":"","cardId":"","shopId":"","num":0};
-	evt.currentTarget.result.createObjectStore(DB_OS_CP, { keyPath: "craftId" });
-}
-
-function success_DB_CP_S(evt){
-	DB_CP_S = evt.currentTarget.result;
-}
 
 log("load csj_mod_craftProcess_s.js done");

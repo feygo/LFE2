@@ -40,24 +40,18 @@ function clearFive(){
 }
 
 /************************ 数据预备区 **********************/
-// {"rs":"","wp":"","zd":"","jn":"","note":"陌上开花缓缓归。"},
-var DB_OS_LFC = USER_NAME+"#lessFiveCard";
-var DB_NAME_LFC = 'LFE2#Mod#lessFiveCard';
-
 var DB_LFC;
-
-function update_DB_LFC(evt){
-	evt.currentTarget.result.createObjectStore(DB_OS_LFC, { keyPath: "cardId" });
-}
-
-function success_DB_LFC(evt){
-	DB_LFC = evt.currentTarget.result;
+var DB_OS_LFC;
+function success_DB_LFC(db){
+	DB_OS_LFC = DC[FIVECARD_N].userOS;
+	DB_LFC = db;
 	loadLessFive();
 	clearFive();
 }
 /********************** 自动执行区**********************/
+var FIVECARD_N="mod_lessFiveCard";
 function csjLoad_mod_lessFiveCard_cc(){
-	Tool_getDB(DB_NAME_LFC,[DB_OS_LFC],update_DB_LFC,success_DB_LFC);
+	Tool_connModDB(FIVECARD_N,success_DB_LFC);
 }
 csjLoad_mod_lessFiveCard_cc();
 log("load csj_mod_lessFiveCard_cc.js");

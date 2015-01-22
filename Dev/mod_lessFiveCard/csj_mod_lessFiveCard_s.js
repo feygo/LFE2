@@ -3,8 +3,9 @@
 // 更新不满足5张数量的卡片
 function saveLessFiveByShop(card){
 	if(DB_LFC_S==undefined){
-		Tool_getDB(DB_NAME_LFC,[DB_OS_LFC],update_DB_LFC_S,function(evt){
-			success_DB_LFC_S(evt);
+		Tool_connModDB(FIVECARD_N,function(db){
+			DB_OS_LFC = DC[FIVECARD_N].userOS;
+			DB_LFC_S = db;
 			saveLessFiveByShopEx(card);
 		});
 	}else{
@@ -48,12 +49,7 @@ function saveLessFiveByShopEx(card){
 	}
 }
 /************************ 数据预备区 **********************/
-var DB_OS_LFC = USER_NAME+"#lessFiveCard";
-var DB_NAME_LFC = 'LFE2#Mod#lessFiveCard';
-
+var DB_OS_LFC;
 var DB_LFC_S;
-
-function success_DB_LFC_S(evt){
-	DB_LFC_S = evt.currentTarget.result;
-}
+var FIVECARD_N="mod_lessFiveCard";
 log("load csj_mod_lessFiveCard_s.js done");

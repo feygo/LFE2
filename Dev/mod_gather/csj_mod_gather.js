@@ -174,7 +174,7 @@ function AfterGA(type,res){
 		}
 		// log(R);
 		//存储采集结果
-		DB_GA.transaction([DC[GA_N].userOS], "readwrite").objectStore(DC[GA_N].userOS).add(R);
+		DB_GA.transaction([DB_OS_GARS], "readwrite").objectStore(DB_OS_GARS).add(R);
 		//判断是否继续运行		
 		// 5.1、执行次数到达
 		tmpRunCnt++;
@@ -198,7 +198,7 @@ function AfterGA(type,res){
 	}else{
 		// 存储采集结果
 		var rl={"rs":"","wp":"","zd":"","jn":"","note":"异常："+res.msg};		
-		var reqAdd2 = DB_GA.transaction([DC[GA_N].userOS], "readwrite").objectStore(DC[GA_N].userOS).add(rl);
+		var reqAdd2 = DB_GA.transaction([DB_OS_GARS], "readwrite").objectStore(DB_OS_GARS).add(rl);
 		reqAdd2.onsuccess=function(evt){
 			debug(evt);
 		}		
@@ -267,7 +267,7 @@ function loadGA(port){
 	R["ap"]=getAP();
 	//读取战斗结果	
 	var garsList=[];
-	var objectStore = DB_GA.transaction([DC[GA_N].userOS], "readonly").objectStore(DC[GA_N].userOS);
+	var objectStore = DB_GA.transaction([DB_OS_GARS], "readonly").objectStore(DB_OS_GARS);
 	objectStore.openCursor().onsuccess = function(event) {
 		var cursor = event.target.result;
 		if (cursor) {
@@ -294,7 +294,7 @@ function beginGA(data){
 			FailCnt=data.failNum;
 			tmpRunCnt=0;
 			tmpFailCnt=0;
-			var reqClear = DB_GA.transaction([DC[GA_N].userOS], "readwrite").objectStore(DC[GA_N].userOS).clear();
+			var reqClear = DB_GA.transaction([DB_OS_GARS], "readwrite").objectStore(DB_OS_GARS).clear();
 			reqClear.onsuccess=function(evt){
 				doGA(data.gaType,AfterGA);
 			}			
@@ -305,8 +305,10 @@ function beginGA(data){
 }
 
 /************************ 数据预备区 **********************/
+var DB_OS_GARS;
 var DB_GA;
 function success_DB_GA(db){
+	DB_OS_GARS = DC[GA_N].userOS;
 	DB_GA = db;
 }
 /********************** 通道消息 处理区**********************/

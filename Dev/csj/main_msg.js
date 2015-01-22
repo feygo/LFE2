@@ -18,26 +18,6 @@ function sendRequest(m){
 		}
 	});
 }
-
 /********************** 通道消息 处理区**********************/
-function handlePort_main(port){	
-	if(port.name == "LEF_MAIN"){
-		port.onMessage.addListener(function(msg) {
-			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
-			if (msg.cmd == "clsData"){
-				clsData(msg.id,msg.data);
-			}	
-		});
-	}
-}
-function clsData(name,isAll){
-	if(isAll){
-		Tool_delDB(name);
-	}else{
-	////////////////////////////////////////////////////////////////////
-		Tool_delOS(name,"");
-	}
-}
 
-chrome.runtime.onConnect.addListener(handlePort_main);
 console.log("load main-msg.js done");

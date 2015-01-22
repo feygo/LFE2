@@ -52,21 +52,15 @@ function checkFocusCard(cardId,port){
 	}
 }
 /************************ 数据预备区 **********************/
-var DB_OS_CF = USER_NAME+"#craftFocus";
-var DB_NAME_CF = 'LFE2#Mod#craftFocus';
-
+var DB_OS_CF;
 var DB_CF;
-
-function update_DB_CF(evt){
-	// {"craftId":"","cardId":"","shopId":"","num":0};
-	evt.currentTarget.result.createObjectStore(DB_OS_CF, { keyPath: "cardId" });
-}
-function success_DB_CF(evt){
-	DB_CF = evt.currentTarget.result;
+function success_DB_CF(db){
+	DB_OS_CF = DC[FOCUSCARD_N].userOS;
+	DB_CF = db;
 }
 /********************** 通道消息 处理区**********************/
 function handlePort_modCraftFocus(port){	
-	if(port.name == "mod_craftFocus"){
+	if(port.name == FOCUSCARD_N){
 		port.onMessage.addListener(function(msg) {
 			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "load"){
@@ -82,9 +76,10 @@ function handlePort_modCraftFocus(port){
 	}
 }
 /********************** 自动执行区**********************/
+var FOCUSCARD_N="mod_craftFocus";
 function csjLoad_mod_craftFocus(){
 	chrome.runtime.onConnect.addListener(handlePort_modCraftFocus);
-	Tool_getDB(DB_NAME_CF,[DB_OS_CF],update_DB_CF,success_DB_CF);
+	Tool_connModDB(FOCUSCARD_N,success_DB_CF);
 }
 csjLoad_mod_craftFocus();
 log("load csj_mod_craftFocus.js done");

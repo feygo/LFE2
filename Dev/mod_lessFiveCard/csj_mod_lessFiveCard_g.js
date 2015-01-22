@@ -16,7 +16,7 @@ function getLessFive(port){
 }
 /********************** 通道消息 处理区**********************/
 function handlePort_modLessFiveCard(port){	
-	if(port.name == "mod_lessFiveCard"){
+	if(port.name == FIVECARD_N){
 		port.onMessage.addListener(function(msg) {
 			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "load"){
@@ -26,22 +26,16 @@ function handlePort_modLessFiveCard(port){
 	}
 }
 /************************ 数据预备区 **********************/
-// {"rs":"","wp":"","zd":"","jn":"","note":"陌上开花缓缓归。"},
-var DB_OS_LFC = USER_NAME+"#lessFiveCard";
-var DB_NAME_LFC = 'LFE2#Mod#lessFiveCard';
-
+var DB_OS_LFC;
 var DB_LFC_G;
-
-function update_DB_LFC_G(evt){
-	evt.currentTarget.result.createObjectStore(DB_OS_LFC, { keyPath: "cardId" });
-}
-
-function success_DB_LFC_G(evt){
-	DB_LFC_G = evt.currentTarget.result;
+function success_DB_LFC_G(db){
+	DB_OS_LFC = DC[FIVECARD_N].userOS;
+	DB_LFC_G = db;
 }
 /********************** 自动执行区**********************/
+var FIVECARD_N="mod_lessFiveCard";
 function csjLoad_mod_lessFiveCard_g(){
-	Tool_getDB(DB_NAME_LFC,[DB_OS_LFC],update_DB_LFC_G,success_DB_LFC_G);
+	Tool_connModDB(FIVECARD_N,success_DB_LFC_G);
 	chrome.runtime.onConnect.addListener(handlePort_modLessFiveCard);
 }
 csjLoad_mod_lessFiveCard_g();

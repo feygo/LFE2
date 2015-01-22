@@ -65,11 +65,11 @@ function Tool_connDB(DB_NAME,version,succFunc) {
 	if (!window.indexedDB) {
 		alert("你的浏览器不支持IndexedDB，插件数据无法保存，请更新最新的chrome浏览器！")
 	}
-	debug("准备连接数据库"+DB_NAME);
+	debug("准备连接数据库："+DB_NAME);
 	var req = window.indexedDB.open(DB_NAME,version);
 	req.onsuccess = function (evt) {
 		var DB = this.result;		
-		debug("连接数据库 "+DB_NAME+" DONE");		
+		debug("成功连接数据库："+DB_NAME);		
 		succFunc(DB);
 	};
 	req.onerror = function (evt) {
@@ -80,7 +80,7 @@ function Tool_connDB(DB_NAME,version,succFunc) {
 	};
 }
 
-// 根据db名称、os名称获取数据库连接
+/*** (不再使用的方法)根据db名称、os名称获取数据库连接
 function Tool_getDB(DB_NAME,OS_List,updateFunc,succFunc) {
 	if (!window.indexedDB) {
 		alert("你的浏览器不支持IndexedDB，插件数据无法保存，请更新最新的chrome浏览器！")
@@ -122,16 +122,18 @@ function Tool_getDB(DB_NAME,OS_List,updateFunc,succFunc) {
 	req.onerror = function (evt) {
 		debug("initDb:"+evt.target.error.message);
 	};
-
 }
+*****/
 // 删除数据库
 function Tool_delDB(DB_NAME){
 	var delReq=window.indexedDB.deleteDatabase(DB_NAME);
 	delReq.onsuccess=function(e){
 		debug("删除数据库："+DB_NAME);
+		debug(e);
+		// return e.target.readyState
 	}
 	delReq.onerror=function(e){
-		debug("删除数据库出错："+e.target.error.message);
+		error("删除数据库出错："+e.target.error.message);
 	}	
 }
 // 删除数据中的数据对象
@@ -157,7 +159,6 @@ function Tool_delOS(DB_NAME,DB_OS_NAME){
 		}		
 	}
 }
-
 /**********************数据结构定义区***************************/
 function upgrade(evt){
 	var db = evt.currentTarget.result;
@@ -169,19 +170,19 @@ function upgrade(evt){
 			// {"rs":"","wp":"","zd":"","jn":"","note":"陌上开花缓缓归。"},
 			db.createObjectStore(DC["mod_gather"].userOS, { autoIncrement: true });
 		}
-		debug("更新"+dbName+" DONE");		
+		debug("更新"+dbName);		
 	}else if((DC["mod_note"]!=undefined)&&(dbName==DC["mod_note"].data)){
 		if (evt.oldVersion < 1) {
 			// {user:"",note:""}
 			db.createObjectStore(DC["mod_note"].userOS, { keyPath: "user" });
 		}
-		debug("更新"+dbName+" DONE");		
+		debug("更新"+dbName);		
 	}else if((DC["mod_multDeck"]!=undefined)&&(dbName==DC["mod_multDeck"].data)){
 		if (evt.oldVersion < 1) {
 			// {"gearName":gn,"userCost":uc,"userSpi":us,"deckInfo":diList};
 			db.createObjectStore(DC["mod_multDeck"].userOS, { keyPath: "gearName" });
 		}
-		debug("更新"+dbName+" DONE");		
+		debug("更新"+dbName);		
 	}else if((DC["mod_sortDeck"]!=undefined)&&(dbName==DC["mod_sortDeck"].data)){
 		if (evt.oldVersion < 1) {
 			// {"id":gn,"data":uc};
@@ -189,25 +190,61 @@ function upgrade(evt){
 			// {"key":gn,"value":uc};
 			db.createObjectStore(DC["mod_sortDeck"].userOS[1], { keyPath: "key" });
 		}
-		debug("更新"+dbName+" DONE");		
+		debug("更新"+dbName);		
 	}else if((DC["mod_train"]!=undefined)&&(dbName==DC["mod_train"].data)){
 		if (evt.oldVersion < 1) {
 			// {"rs":"","jq":"","jy":"","jn":"","note":""};
 			db.createObjectStore(DC["mod_train"].userOS, { autoIncrement: true });
 		}
-		debug("更新"+dbName+" DONE");		
+		debug("更新"+dbName);		
 	}else if((DC["mod_lessFiveCard"]!=undefined)&&(dbName==DC["mod_lessFiveCard"].data)){
 		if (evt.oldVersion < 1) {
 			// 
 			db.createObjectStore(DC["mod_lessFiveCard"].userOS, { keyPath: "cardId" });
 		}
-		debug("更新"+dbName+" DONE");		
+		debug("更新"+dbName);		
+	}else if((DC["mod_craftProcess"]!=undefined)&&(dbName==DC["mod_craftProcess"].data)){
+		if (evt.oldVersion < 1) {
+			// {"craftId":"","cardId":"","shopId":"","num":0};
+			db.createObjectStore(DC["mod_craftProcess"].userOS, { keyPath: "craftId" });
+		}
+		debug("更新"+dbName);		
+	}else if((DC["mod_craftFocus"]!=undefined)&&(dbName==DC["mod_craftFocus"].data)){
+		if (evt.oldVersion < 1) {
+			// {"cardId":"","cardName":"","num":0};
+			db.createObjectStore(DC["mod_craftFocus"].userOS, { keyPath: "cardId" });
+		}
+		debug("更新"+dbName);		
+	}else if((DC["mod_invFocus"]!=undefined)&&(dbName==DC["mod_invFocus"].data)){
+		if (evt.oldVersion < 1) {
+			// {"itemId":"","itemName":"","norNum:":0,"lootNum:":0}
+			db.createObjectStore(DC["mod_invFocus"].userOS, { keyPath: "itemId" });
+		}
+		debug("更新"+dbName);		
 	}
-	
-	
 }
+/**********************消息服务区***************************/
+function handlePort_main(port){	
+	if(port.name == "MAIN_DATA"){
+		port.onMessage.addListener(function(msg) {
+			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+			if (msg.cmd == "delData"){
+				delData(msg.id,msg.data);
+			}	
+		});
+	}
+}
+function delData(modName,isAll){
+	if(isAll){
+		// Tool_delDB(modName);
+	}else{
+		// Tool_delOS(modName,DC[modName].userOS);
+	}
+}
+
 /**********************自动载入区***************************/
 function loadMainData(){
+	chrome.runtime.onConnect.addListener(handlePort_main);
 	checkIdleDB();
 	// Tool_connModDB("mod_gather",function(){});
 	// Tool_connModDB("mod_gather",function(){});

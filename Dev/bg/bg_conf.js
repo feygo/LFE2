@@ -66,7 +66,7 @@ console.log("load bg_conf.js");
 				}
 		],
 		"data":"LFE2#Mod#MultDeck",
-		"preOS":"#mdeck",
+		"preOS":"#gear",
 		"version":1
 	},
 	"mod_sortDeck":{
@@ -212,7 +212,9 @@ console.log("load bg_conf.js");
 					"pop":""
 				}
 		],
-		"data":"LFE2#Mod#craftProcess"
+		"data":"LFE2#Mod#craftProcess",
+		"preOS":"#craftCard",
+		"version":1
 	},
 	"mod_craftFocus":{
 		"mod":"合成卡片监控",
@@ -237,20 +239,28 @@ console.log("load bg_conf.js");
 					"pop":""
 				}
 		],
-		"data":"LFE2#Mod#craftFocus"
+		"data":"LFE2#Mod#craftFocus",
+		"preOS":"#focusCard",
+		"version":1
 	},
 	"mod_invFocus":{
-		"mod":"背景材料监控",
+		"mod":"背包材料监控",
 		"modconf":{},
 		"dept":[],
 		"bg":[],
 		"urlist":[
 				{	"url":"#/character/inventory",
+					"js":["/mod_invFocus/csj_mod_invFocus_ci.js"],
+					"pop":""
+				},
+				{	"url":"#/*",
 					"js":["/mod_invFocus/csj_mod_invFocus.js"],
 					"pop":""
 				}
 		],
-		"data":"LFE2#Mod#invFocus"
+		"data":"LFE2#Mod#invFocus",
+		"preOS":"#invItem",
+		"version":1
 	},
 	"mod_craftFocusItem":{
 		"mod":"合成材料监控",
@@ -259,11 +269,10 @@ console.log("load bg_conf.js");
 		"bg":[],
 		"urlist":[
 				{	"url":"#/*",
-					"js":["/mod_craftFocusItem/csj_mod_craftFocusItem.js"],
+					"js":[],
 					"pop":"监控材料:/mod_craftFocusItem/pop_mod_craftFocusItem.html"
 				}
-		],
-		"data":"LFE2#Mod#invFocus"
+		]
 	}
 }
 	// "mod_mapShow":{

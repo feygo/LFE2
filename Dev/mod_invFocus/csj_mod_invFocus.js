@@ -1,67 +1,50 @@
 ﻿log("load csj_mod_invFocus.js");
 
 /*********************物品记录区*************************/
-function loadItemList(){
-	var itemList=[];
-	var list=document.querySelectorAll("div.realitem A.item.info");
-	for(var i=0;i<list.length;i++){
-		var itemId=list[i].id.replace("item","");
-		var itemName=Tool_trim(list[i].innerText);
-		itemList.push({"itemId":itemId,"itemName":itemName});
-	}	
-	return itemList;
+function getInvFocusItem(itemId,port){
+	var os=DB_IF.transaction([DB_OS_IF], "readonly").objectStore(DB_OS_IF);
+	var requestUpdate=os.get(itemId);
+	requestUpdate.onerror = function(evt) {
+		error("获得背包物品信息出错:"+evt.target.error.message);
+	};
+	requestUpdate.onsuccess = function(evt) {
+		var item=evt.target.result;
+		if(item){
+			port.postMessage({"cmd":"get.rs","id":itemId,"data":item});
+			debug("获得背包物品信息:"+JSON.stringify(item));
+		}else{
+			port.postMessage({"cmd":"get.rs","id":itemId,"data":null});
+		}
+	};
 }
-function storeItem(){
-	var itemList=loadItemList();
-	var os=DB_IF.transaction([DB_OS_IF], "readwrite").objectStore(DB_OS_IF);
-	// 清空现有数据
-	var clsReq=os.clear();
-	clsReq.onsuccess=function (evt){
-		debug("物品清空成功:"+evt);
-	}
-	clsReq.onerror=function(evt){
-		debug("物品清空出错:"+evt);
-	}
-	for(var i=0;i<itemList.length;i++){
-		var itemData={};
-		var itemId=itemList[i].itemId;
-		itemData["itemId"]=itemId;
-		itemData["itemName"]=itemList[i].itemName;
-		var lootNumStr=document.querySelector("#looting_item_nownum"+itemId);
-		if(lootNumStr){
-			itemData["lootNum"]=parseInt(lootNumStr.innerText);		
-		}
-		var norNumStr=document.querySelector("#item_nownum"+itemId);
-		if(norNumStr){
-			itemData["norNum"]=parseInt(norNumStr.innerText);		
-		}
-		// debug(itemData);
-		var requestUpdate=os.put(itemData);
-		requestUpdate.onerror = function(evt) {
-			debug("物品更新出错:"+evt.target.error.message);
-		};
-		requestUpdate.onsuccess = function(evt) {
-			debug("物品更新成功:"+evt.target.result);
-		};
+function getUserInvAction(port){
+	port.postMessage({"cmd":"getUserInv.rs","data":USER_INV});
+}
+/********************** 通道消息 处理区**********************/
+function handlePort_modInvFocus(port){	
+	if(port.name == INVFOCUS_N){
+		port.onMessage.addListener(function(msg) {
+			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+			if (msg.cmd == "get"){
+				getInvFocusItem(msg.id,port);
+			}else if (msg.cmd == "getUserInv"){
+				getUserInvAction(port);
+			}	
+		});
 	}
 }
 /************************ 数据预备区 **********************/
-var DB_OS_IF = USER_NAME+"#invFocus";
-var DB_NAME_IF = 'LFE2#Mod#invFocus';
-
+var DB_OS_IF;
 var DB_IF;
-
-function update_DB_IF(evt){
-	// {"itemId":"","itemName":"","norNum:":0,"lootNum:":0}
-	evt.currentTarget.result.createObjectStore(DB_OS_IF, { keyPath: "itemId" });
-}
-function success_DB_IF(evt){
-	DB_IF = evt.currentTarget.result;
-	storeItem();
+function success_DB_IF(db){
+	DB_OS_IF = DC[INVFOCUS_N].userOS;
+	DB_IF = db;
 }
 /********************** 自动执行区**********************/
+var INVFOCUS_N="mod_invFocus";
 function csjLoad_mod_invFocus(){
-	Tool_getDB(DB_NAME_IF,[DB_OS_IF],update_DB_IF,success_DB_IF);
+	chrome.runtime.onConnect.addListener(handlePort_modInvFocus);
+	Tool_connModDB(INVFOCUS_N,success_DB_IF);
 }
 csjLoad_mod_invFocus();
 log("load csj_mod_invFocus.js done");

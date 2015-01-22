@@ -3,7 +3,7 @@ var bg = chrome.extension.getBackgroundPage();
 bg.log("popup load pop_mod_craftFocusItem.js");
 /*********************** 页面通道 通讯区 *********************/
 var port_cf;
-var port_cfi;
+var port_if;
 function loadPort(){
 	chrome.tabs.getSelected(function(tab){
 		port_cf = chrome.tabs.connect(tab.id,{name: "mod_craftFocus"});
@@ -19,9 +19,9 @@ function loadPort(){
 			}
 		});
 		
-		port_cfi = chrome.tabs.connect(tab.id,{name: "mod_craftFocusItem"});
-		port_cfi.onMessage.addListener(function(msg) {
-			bg.debug("收到"+port_cfi.name+"通道消息："+JSON.stringify(msg));
+		port_if = chrome.tabs.connect(tab.id,{name: "mod_invFocus"});
+		port_if.onMessage.addListener(function(msg) {
+			bg.debug("收到"+port_if.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "get.rs"){
 				// 更新合成材料的背包数量
 				var itemNum=setItemN(msg.id,msg.data);	
@@ -39,7 +39,7 @@ function loadPort(){
 }
 // 载入用户背包数据
 function loadUserInv(){
-	port_cfi.postMessage({"cmd":"getUserInv"});
+	port_if.postMessage({"cmd":"getUserInv"});
 }
 function updateUserInv(data){
 	document.getElementById("nNum").innerText=data.nNum;
@@ -366,7 +366,7 @@ function getCraftItem(cardId){
 					// 获取背包材料的相关信息
 					if(itemCache[item.itemId]){
 					}else{
-						port_cfi.postMessage({"cmd":"get","id":item.itemId});
+						port_if.postMessage({"cmd":"get","id":item.itemId});
 						itemCache[item.itemId]=1;
 					}
 

@@ -25,25 +25,17 @@ function checkFocusCard(){
 }
 
 /************************ 数据预备区 **********************/
-var DB_OS_CF = USER_NAME+"#craftFocus";
-var DB_NAME_CF = 'LFE2#Mod#craftFocus';
-
+var DB_OS_CF;
 var DB_CF_C;
-
-function update_DB_CF_C(evt){
-	// {"cardId":"","cardName":"","num":0};
-	evt.currentTarget.result.createObjectStore(DB_OS_CF, { keyPath: "cardId" });
-}
-
-function success_DB_CF_C(evt){
-	DB_CF_C = evt.currentTarget.result;
+function success_DB_CF_C(db){
+	DB_OS_CF = DC[FOCUSCARD_N].userOS;
+	DB_CF_C = db;
+	checkFocusCard();
 }
 /********************** 自动执行区**********************/
+var FOCUSCARD_N="mod_craftFocus";
 function csjLoad_mod_cf_c(){
-	Tool_getDB(DB_NAME_CF,[DB_OS_CF],update_DB_CF_C,function(evt){
-			success_DB_CF_C(evt);
-			checkFocusCard();
-		});
+	Tool_connModDB(FOCUSCARD_N,success_DB_CF_C);
 }
 csjLoad_mod_cf_c();
 log("load csj_mod_craftFocus_c.js done");

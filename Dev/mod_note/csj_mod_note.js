@@ -2,8 +2,8 @@
 
 /********************** common记录功能操作区**********************/
 function loadRec(port){
-	var request = DB_Note.transaction([DC[NOTE_N].userOS], "readonly")
-                .objectStore(DC[NOTE_N].userOS)
+	var request = DB_Note.transaction([DB_OS_Note], "readonly")
+                .objectStore(DB_OS_Note)
                 .get(USER_NAME);
 	request.onsuccess = function(evt){
 		if(evt.target.result){
@@ -17,15 +17,17 @@ function loadRec(port){
 function saveRec(rec){
 	//存储数据
 	var note={"user":USER_NAME,"note":rec};
-	var objectStore = DB_Note.transaction([DC[NOTE_N].userOS], "readwrite").objectStore(DC[NOTE_N].userOS);
+	var objectStore = DB_Note.transaction([DB_OS_Note], "readwrite").objectStore(DB_OS_Note);
 	var requestUpdate = objectStore.put(note);
 	requestUpdate.onerror = function(event) {
 		error("更新记事本数据出错:"+evt.target.error.message);
 	};	
 }
 /************************ 数据预备区 **********************/
+var DB_OS_Note;
 var DB_Note;
 function success_DB_Note(db){
+	DB_OS_Note = DC[NOTE_N].userOS;
 	DB_Note = db;
 }
 /********************** 通道消息 处理区**********************/
