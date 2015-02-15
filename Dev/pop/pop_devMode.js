@@ -11,7 +11,7 @@ function loadModList(){
 		var conf=bg.MOD_NOW[modId];
 		bg.debug(conf["data"]);
 		if(conf["data"]){
-			addModListTD(rTable,modId,conf["mod"],conf["data"]);
+			addModListTD(rTable,modId,conf["mod"],conf["data"].toString());
 		}
 	}
 }
@@ -22,7 +22,7 @@ function addModListTitle(rTable){
 	tdT1.innerHTML="<b>Mod名称</b>";
 	var tdT2=document.createElement("td");
 	tdT2.className='name c5';
-	tdT2.innerHTML="<b>DB名称</b>";
+	tdT2.innerHTML="<b>OS名称</b>";
 	var tdT3=document.createElement("td");
 	tdT3.className='name c5';
 	tdT3.innerHTML="<b>操作</b>";
@@ -63,10 +63,8 @@ function addModListTD(rTable,modId,modName,data){
 	rTable.appendChild(tr1);
 }
 function del(){
-	//检测是否应用至所以用户
-	var isAll=document.getElementById("isAllUser").checked;
 	var b=event.srcElement;	
-	port.postMessage({"cmd":"delData","id":b.value,"data":isAll});
+	port.postMessage({"cmd":"clsData","id":b.id});
 }
 function delStat(id,data){
 	var stat=document.getElementById("stat_"+id);
@@ -83,7 +81,7 @@ function loadPort(){
 		// 接收监控卡片列表
 		port.onMessage.addListener(function(msg) {
 			bg.debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
-			if (msg.cmd == "delData.rs"){
+			if (msg.cmd == "clsData.rs"){
 				delStat(msg.id,msg.data);
 			}
 		});

@@ -46,9 +46,7 @@ console.log("load bg_conf.js");
 					"pop":"记事本:/mod_note/pop_mod_note.html"
 				}
 		],
-		"data":"LFE2#Mod#Note",
-		"preOS":"#note",
-		"version":1
+		"data":["Mod#Note#note"]
 	},
 	"mod_multDeck":{
 		"mod":"多卡组",
@@ -65,9 +63,7 @@ console.log("load bg_conf.js");
 					"pop":"多卡组:/mod_multDeck/pop_mod_multDeck.html"
 				}
 		],
-		"data":"LFE2#Mod#MultDeck",
-		"preOS":"#gear",
-		"version":1
+		"data":["Mod#MultDeck#gear"]
 	},
 	"mod_sortDeck":{
 		"mod":"卡组排序",
@@ -84,9 +80,7 @@ console.log("load bg_conf.js");
 					"pop":"排序卡组:/mod_sortDeck/pop_mod_sortDeck.html"
 				}
 		],
-		"data":"LFE2#Mod#SortDeck",
-		"preOSList":["#sort","#sortConf"],
-		"version":1
+		"data":["Mod#SortDeck#sort","Mod#SortDeck#sortConf"]
 	},
 	"mod_gather":{
 		"mod":"自动采集",
@@ -99,9 +93,7 @@ console.log("load bg_conf.js");
 					"pop":"采集:/mod_gather/pop_mod_gather.html"
 				}
 		],
-		"data":"LFE2#Mod#Gather",
-		"preOS":"#gatherRS",
-		"version":1
+		"data":["Mod#Gather#gatherRS"]
 	},
 	"mod_train":{
 		"mod":"自动训练",
@@ -116,9 +108,7 @@ console.log("load bg_conf.js");
 					"pop":"训练:/mod_train/pop_mod_train.html"
 				}
 		],
-		"data":"LFE2#Mod#Train",
-		"preOS":"#trainRS",
-		"version":1
+		"data":["Mod#Train#trainRS"]
 	},
 	"mod_cityInfoGet":{
 		"mod":"城市信息获取",
@@ -189,9 +179,7 @@ console.log("load bg_conf.js");
 				}
 				
 		],
-		"data":"LFE2#Mod#lessFiveCard",
-		"preOS":"#fiveCard",
-		"version":1
+		"data":["Mod#lessFiveCard#fiveCard"]
 	},
 	"mod_craftProcess":{
 		"mod":"合成卡片收集度",
@@ -212,9 +200,7 @@ console.log("load bg_conf.js");
 					"pop":""
 				}
 		],
-		"data":"LFE2#Mod#craftProcess",
-		"preOS":"#craftCard",
-		"version":1
+		"data":["Mod#craftProcess#craftCard"]
 	},
 	"mod_craftFocus":{
 		"mod":"合成卡片监控",
@@ -239,9 +225,7 @@ console.log("load bg_conf.js");
 					"pop":""
 				}
 		],
-		"data":"LFE2#Mod#craftFocus",
-		"preOS":"#focusCard",
-		"version":1
+		"data":["Mod#craftFocus#focusCard"]
 	},
 	"mod_invFocus":{
 		"mod":"背包材料监控",
@@ -258,9 +242,7 @@ console.log("load bg_conf.js");
 					"pop":""
 				}
 		],
-		"data":"LFE2#Mod#invFocus",
-		"preOS":"#invItem",
-		"version":1
+		"data":["Mod#invFocus#invItem"]
 	},
 	"mod_craftFocusItem":{
 		"mod":"合成材料监控",
@@ -517,25 +499,12 @@ function bg_conf_RequestListener(msg, sender, sendResponse) {
 		}
 		sendResponse({"res": idleDBList});			
 	}
-	if(msg.cmd=="DC"){	
-		if(MOD_NOW[msg.id]){
-			if(MOD_NOW[msg.id].data){
-				var data={};
-				data["data"]=MOD_NOW[msg.id].data;
-				data["version"]=MOD_NOW[msg.id].version;
-				if(MOD_NOW[msg.id].preOS){
-					data["preOS"]=MOD_NOW[msg.id].preOS;
-				}
-				if(MOD_NOW[msg.id].preOSList){
-					data["preOSList"]=MOD_NOW[msg.id].preOSList;
-				}
-				sendResponse({"res": data});	
-			}else{
-				sendResponse({"res": null});	
-			}
-		}else{
-			sendResponse({"res": null});	
+	if(msg.cmd=="dataConf"){	
+		var data={}
+		for(var modId in MOD_DEF){
+			data[modId]=MOD_DEF[modId].data;
 		}
+		sendResponse({"res": data});
 	}
 }
 /********************** 自动执行区**********************/

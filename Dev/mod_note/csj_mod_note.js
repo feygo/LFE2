@@ -27,7 +27,7 @@ function saveRec(rec){
 var DB_OS_Note;
 var DB_Note;
 function success_DB_Note(db){
-	DB_OS_Note = DC[NOTE_N].userOS;
+	DB_OS_Note = DC[NOTE_N][0];
 	DB_Note = db;
 }
 /********************** 通道消息 处理区**********************/
@@ -47,7 +47,7 @@ function handlePort_modNote(port){
 var NOTE_N="mod_note";
 function csjLoad_mod_note(){
 	chrome.runtime.onConnect.addListener(handlePort_modNote);
-	Tool_connModDB(NOTE_N,success_DB_Note);
+	Tool_connUserDB(success_DB_Note);
 }
 csjLoad_mod_note();
 

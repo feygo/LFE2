@@ -23,35 +23,42 @@ function checkIdleDB(){
 // },
 *****/
 var DC={}
-function getDataConf(){
-	// 如果没有，则向后台发起请求 获取配置
-	var msg={"msg":{"type":"bg_conf","cmd":"dataConf"},
-	"func":function(msg){
-			var data=msg.res;				
-			if(data){
-				// 写入缓存
-				DC=data;
-				debug(DC);
-				// 连接数据库
-			}else{
-				error("未获得数据库配置信息");
-			}
-		}
-	};
-	sendRequest(msg);
-}
 /**********************数据库操作区***************************/
-//  获取数据库连接的方法
-var DB_NAME_PRE="LFE2#";
-var VERSION=1;
-function Tool_connUserDB(succFunc) {
-	if(USER_NAME==""){
-		error("没有获得到用户名称，无法获得数据库连接");
-		return null;
+// 根据ModName获取数据库连接，正常情况
+function Tool_connModDB(modName,succFunc){
+	// 检测本地缓存获取配置
+	if(DC[modName]){
+		Tool_connDB(DC[modName].data,DC[modName].version,succFunc)
 	}else{
-		var dbName=DB_NAME_PRE+USER_NAME;
-		Tool_connDB(dbName,VERSION,succFunc);
+		// 如果没有，则向后台发起请求 获取配置
+		var msg={"msg":{"type":"bg_conf","cmd":"DC","id":modName},
+		"func":function(msg){
+				var data=msg.res;				
+				if(data){
+					// 写入缓存
+					if(data["preOS"]){
+						data["userOS"]=USER_NAME+data["preOS"];
+					}
+					if(data["preOSList"]){
+						var list=[];
+						for(var i=0;i<data["preOSList"].length;i++){
+							debug(data["preOSList"][i]);
+							list.push(USER_NAME+data["preOSList"][i]);
+						}
+						data["userOS"]=list;
+					}
+					DC[modName]=data;
+					debug(DC);
+					// 连接数据库
+					Tool_connDB(DC[modName].data,DC[modName].version,succFunc)
+				}else{
+					error("没有关于此mod的配置："+modName);
+				}
+			}
+		};
+		sendRequest(msg);
 	}
+	
 }
 // 根据db名称、os名称获取数据库连接，正常情况
 function Tool_connDB(DB_NAME,version,succFunc) {
@@ -72,6 +79,7 @@ function Tool_connDB(DB_NAME,version,succFunc) {
 		upgrade(evt)
 	};
 }
+
 /*** (不再使用的方法)根据db名称、os名称获取数据库连接
 function Tool_getDB(DB_NAME,OS_List,updateFunc,succFunc) {
 	if (!window.indexedDB) {
@@ -151,88 +159,68 @@ function Tool_delOS(DB_NAME,DB_OS_NAME){
 		}		
 	}
 }
-function Tool_clsOS(DB_NAME,DB_OS_NAME){
-	var req=window.indexedDB.open(DB_NAME);
-	debug("clsOS方法-连接数据库："+DB_NAME);	
-	req.onsuccess = function (evt) {
-		var db = this.result;
-		var objectStore=db.transaction([DB_OS_NAME], "readwrite").objectStore(DB_OS_NAME);
-		var clsReq=objectStore.clear();
-		clsReq.onsuccess = function (evt) {
-			debug("清空数据对象："+DB_OS_NAME);
-			db.close();
-		}	
-	}
-}
 /**********************数据结构定义区***************************/
 function upgrade(evt){
 	var db = evt.currentTarget.result;
 	// debug(db);
-	if(DC["mod_gather"]!=undefined){
+	var dbName=db.name;
+	if((DC["mod_gather"]!=undefined)&&(dbName==DC["mod_gather"].data)){
 		// Version 1 is the first version of the database.
 		if (evt.oldVersion < 1) {
 			// {"rs":"","wp":"","zd":"","jn":"","note":"陌上开花缓缓归。"},
-			db.createObjectStore(DC["mod_gather"][0], { autoIncrement: true });
+			db.createObjectStore(DC["mod_gather"].userOS, { autoIncrement: true });
 		}
-		debug("更新mod_gather数据结构");		
-	}
-	if(DC["mod_note"]!=undefined){
+		debug("更新"+dbName);		
+	}else if((DC["mod_note"]!=undefined)&&(dbName==DC["mod_note"].data)){
 		if (evt.oldVersion < 1) {
 			// {user:"",note:""}
-			db.createObjectStore(DC["mod_note"][0], { keyPath: "user" });
+			db.createObjectStore(DC["mod_note"].userOS, { keyPath: "user" });
 		}
-		debug("更新mod_note数据结构");		
-	}
-	if(DC["mod_multDeck"]!=undefined){
+		debug("更新"+dbName);		
+	}else if((DC["mod_multDeck"]!=undefined)&&(dbName==DC["mod_multDeck"].data)){
 		if (evt.oldVersion < 1) {
 			// {"gearName":gn,"userCost":uc,"userSpi":us,"deckInfo":diList};
-			db.createObjectStore(DC["mod_multDeck"][0], { keyPath: "gearName" });
+			db.createObjectStore(DC["mod_multDeck"].userOS, { keyPath: "gearName" });
 		}
-		debug("更新mod_multDeck数据结构");		
-	}
-	if(DC["mod_sortDeck"]!=undefined){
+		debug("更新"+dbName);		
+	}else if((DC["mod_sortDeck"]!=undefined)&&(dbName==DC["mod_sortDeck"].data)){
 		if (evt.oldVersion < 1) {
 			// {"id":gn,"data":uc};
-			db.createObjectStore(DC["mod_sortDeck"][0], { keyPath: "id" });
+			db.createObjectStore(DC["mod_sortDeck"].userOS[0], { keyPath: "id" });
 			// {"key":gn,"value":uc};
-			db.createObjectStore(DC["mod_sortDeck"][1], { keyPath: "key" });
+			db.createObjectStore(DC["mod_sortDeck"].userOS[1], { keyPath: "key" });
 		}
-		debug("更新mod_sortDeck数据结构");		
-	}
-	if(DC["mod_train"]!=undefined){
+		debug("更新"+dbName);		
+	}else if((DC["mod_train"]!=undefined)&&(dbName==DC["mod_train"].data)){
 		if (evt.oldVersion < 1) {
 			// {"rs":"","jq":"","jy":"","jn":"","note":""};
-			db.createObjectStore(DC["mod_train"][0], { autoIncrement: true });
+			db.createObjectStore(DC["mod_train"].userOS, { autoIncrement: true });
 		}
-		debug("更新mod_train数据结构");		
-	}
-	if(DC["mod_lessFiveCard"]!=undefined){
+		debug("更新"+dbName);		
+	}else if((DC["mod_lessFiveCard"]!=undefined)&&(dbName==DC["mod_lessFiveCard"].data)){
 		if (evt.oldVersion < 1) {
 			// 
-			db.createObjectStore(DC["mod_lessFiveCard"][0], { keyPath: "cardId" });
+			db.createObjectStore(DC["mod_lessFiveCard"].userOS, { keyPath: "cardId" });
 		}
-		debug("更新mod_lessFiveCard数据结构");		
-	}
-	if(DC["mod_craftProcess"]!=undefined){
+		debug("更新"+dbName);		
+	}else if((DC["mod_craftProcess"]!=undefined)&&(dbName==DC["mod_craftProcess"].data)){
 		if (evt.oldVersion < 1) {
 			// {"craftId":"","cardId":"","shopId":"","num":0};
-			db.createObjectStore(DC["mod_craftProcess"][0], { keyPath: "craftId" });
+			db.createObjectStore(DC["mod_craftProcess"].userOS, { keyPath: "craftId" });
 		}
-		debug("更新mod_craftProcess数据结构");		
-	}
-	if(DC["mod_craftFocus"]!=undefined){
+		debug("更新"+dbName);		
+	}else if((DC["mod_craftFocus"]!=undefined)&&(dbName==DC["mod_craftFocus"].data)){
 		if (evt.oldVersion < 1) {
 			// {"cardId":"","cardName":"","num":0};
-			db.createObjectStore(DC["mod_craftFocus"][0], { keyPath: "cardId" });
+			db.createObjectStore(DC["mod_craftFocus"].userOS, { keyPath: "cardId" });
 		}
-		debug("更新mod_craftFocus数据结构");		
-	}
-	if(DC["mod_invFocus"]!=undefined){
+		debug("更新"+dbName);		
+	}else if((DC["mod_invFocus"]!=undefined)&&(dbName==DC["mod_invFocus"].data)){
 		if (evt.oldVersion < 1) {
 			// {"itemId":"","itemName":"","norNum:":0,"lootNum:":0}
-			db.createObjectStore(DC["mod_invFocus"][0], { keyPath: "itemId" });
+			db.createObjectStore(DC["mod_invFocus"].userOS, { keyPath: "itemId" });
 		}
-		debug("更新mod_invFocus数据结构");		
+		debug("更新"+dbName);		
 	}
 }
 /**********************消息服务区***************************/
@@ -240,29 +228,26 @@ function handlePort_main(port){
 	if(port.name == "MAIN_DATA"){
 		port.onMessage.addListener(function(msg) {
 			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
-			if (msg.cmd == "clsData"){
-				clsData(msg.id);
-			}else if (msg.cmd == "delDB"){
-				Tool_delDB(DB_NAME_PRE+USER_NAME);
+			if (msg.cmd == "delData"){
+				delData(msg.id,msg.data);
 			}	
 		});
 	}
 }
-function clsData(modName){
-	var dbName=DB_NAME_PRE+USER_NAME;
-	for(var i=0;i<DC[modName].length;i++){
-		Tool_clsOS(dbName,DC[modName][i]);
-	}	
+function delData(modName,isAll){
+	if(isAll){
+		// Tool_delDB(modName);
+	}else{
+		// Tool_delOS(modName,DC[modName].userOS);
+	}
 }
 
 /**********************自动载入区***************************/
 function loadMainData(){
 	chrome.runtime.onConnect.addListener(handlePort_main);
-	getDataConf();
 	// checkIdleDB();
 	// Tool_connModDB("mod_gather",function(){});
 	// Tool_connModDB("mod_gather",function(){});
 }
-// Tool_delDB("LFE2#百目鬼");
 loadMainData();
 console.log("load main_data.js done");
