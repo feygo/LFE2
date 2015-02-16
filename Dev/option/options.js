@@ -62,7 +62,8 @@ function restore_options() {
 			rChecked(lfeName,lfe[lfeName]);		
 		}	
 	}
-
+	// 恢复数据对象操作 显示
+	showDataDiv(lfe["devMode"]);
 	// 恢复mod配置	
 	var modStr=localStorage.getItem("LFE#Mod");
 	console.log("恢复功能：LFE#Mod "+modStr);	
@@ -127,6 +128,18 @@ function setAllModChecked(){
 function setAllModUnChecked(){
 	setAllModStat("0");
 }
+// 设置数据对象操作div 显示
+function setDataDiv(){
+	var d=event.srcElement;
+	showDataDiv(d.value);
+}
+function showDataDiv(value){
+	if(value=="1"){
+		document.getElementById("dataDiv").style.display="";
+	}else{
+		document.getElementById("dataDiv").style.display="none";
+	}	
+}
 
 /*******************页面载入区**************************/
 document.addEventListener("DOMContentLoaded",loadOption);
@@ -148,4 +161,10 @@ function loadOption(){
 	// 绑定全部mod启用停用事件
 	document.getElementById("setChecked").addEventListener('click', setAllModChecked);
 	document.getElementById("setUnChecked").addEventListener('click', setAllModUnChecked);
+	// 绑定开发模式的按钮
+	var devBtnList=document.getElementsByName("devMode");
+	for(var i=0;i<devBtnList.length;i++){
+		devBtnList[i].addEventListener('click', setDataDiv);
+	}
+	
 }

@@ -35,57 +35,63 @@ Linodas Feygo V2 Extension Options:
 </tr>
 <!-- 广告栏 -->
 <tr>
-	<td> <span >隐藏广告栏</span></td>
+	<td> <span >【独立Mod】隐藏广告栏</span></td>
 	<td> <input type="radio" class="mod" name="mod_ad" checked value="1" />	</td>
 	<td> <input type="radio" class="mod" name="mod_ad" value="0" />	</td>
 </tr>
 <!-- 记事本 -->
 <tr>
-	<td> <span >记事本</span></td>
+	<td> <span >【独立Mod】记事本</span></td>
 	<td> <input type="radio" class="mod" name="mod_note" checked value="1" />	</td>
 	<td> <input type="radio" class="mod" name="mod_note" checked value="0" />	</td>
 </tr>
 
 <!-- 卡组 -->
 <tr>
-	<td> <span >多卡组</span></td>
+	<td> <span >【独立Mod】多卡组</span></td>
 	<td> <input type="radio" class="mod" name="mod_multDeck" checked value="1" />	</td>
 	<td> <input type="radio" class="mod" name="mod_multDeck" value="0" />	</td>
 </tr>
 <tr>
-	<td> <span >卡牌排序与筛选</span></td>
+	<td> <span >【独立Mod】卡牌排序与筛选</span></td>
 	<td> <input type="radio" class="mod" name="mod_sortDeck" checked value="1" />	</td>
 	<td> <input type="radio" class="mod" name="mod_sortDeck" value="0" />	</td>
 </tr>
 <!-- 采集 -->
 <tr>
-	<td> <span >自动采集</span></td>
+	<td> <span >【独立Mod】自动采集</span></td>
 	<td> <input type="radio" class="mod" name="mod_gather" checked value="1" />	</td>
 	<td> <input type="radio" class="mod" name="mod_gather" value="0" />	</td>
 </tr>
 <!-- 训练 -->
 <tr>
-	<td> <span >自动训练</span></td>
+	<td> <span >【独立Mod】自动训练</span></td>
 	<td> <input type="radio" class="mod" name="mod_train" checked value="1" />	</td>
 	<td> <input type="radio" class="mod" name="mod_train" value="0" />	</td>
 </tr>
 <tr>
-	<td> <span >|----配置：怪物列表下限范围</span></td>
+	<td> <span >|------配置：怪物列表下限范围</span></td>
 	<td colspan="2"> <input type="input" class="mod_conf" id="mod_train#lvLow" size="3" maxlength="1" value="3" />	</td>
 </tr>
 <tr>
-	<td> <span >|----配置：怪物列表上限范围</span></td>
+	<td> <span >|------配置：怪物列表上限范围</span></td>
 	<td colspan="2"> <input type="input" class="mod_conf" id="mod_train#lvUp" size="3" maxlength="1" value="3" />	</td>
+</tr>
+<!-- 背包 -->
+<tr>
+	<td> <span >【独立Mod】背包物品排序</span></td>
+	<td> <input type="radio" class="mod"  name="mod_invSort" checked value="1" />	</td>
+	<td> <input type="radio" class="mod"  name="mod_invSort" value="0" />	</td>
 </tr>
 <!-- 商店 -->
 <tr>
-	<td> <span >商店信息获取</span></td>
+	<td> <span >【基础Mod】商店信息获取</span></td>
 	<td> <input type="radio" class="mod"  name="mod_mktInfoGet" checked value="1" />	</td>
 	<td> <input type="radio" class="mod"  name="mod_mktInfoGet" value="0" />	</td>
 </tr>
 <!-- 市场 -->
 <tr>
-	<td> <span >城市信息获取</span></td>
+	<td> <span >【基础Mod】城市信息获取</span></td>
 	<td> <input type="radio" class="mod"  name="mod_cityInfoGet" checked value="1" />	</td>
 	<td> <input type="radio" class="mod"  name="mod_cityInfoGet" value="0" />	</td>
 </tr>
@@ -98,36 +104,31 @@ Linodas Feygo V2 Extension Options:
 -->
 <!-- 背包 -->
 <tr>
-	<td> <span >背包物品排序</span></td>
-	<td> <input type="radio" class="mod"  name="mod_invSort" checked value="1" />	</td>
-	<td> <input type="radio" class="mod"  name="mod_invSort" value="0" />	</td>
-</tr>
-<tr>
-	<td> <span >背包材料监控</span></td>
+	<td> <span >【基础Mod】背包材料监控</span></td>
 	<td> <input type="radio" class="mod"  name="mod_invFocus" checked value="1" />	</td>
 	<td> <input type="radio" class="mod"  name="mod_invFocus" value="0" />	</td>
 </tr>
 <!-- 卡片收集 -->
 <tr>
-	<td> <span >未满5张卡片统计(部分功能依赖商店信息获取)</span></td>
+	<td> <span >【综合Mod】未满5张卡片统计(依赖:商店信息获取)</span></td>
 	<td> <input type="radio" class="mod"  name="mod_lessFiveCard" checked value="1" />	</td>
 	<td> <input type="radio" class="mod"  name="mod_lessFiveCard" value="0" />	</td>
 </tr>
 <!-- 合成收集度 -->
 <tr>
-	<td> <span >合成卡片收集度（依赖商店信息获取）</span></td>
+	<td> <span >【综合Mod】合成卡片收集度（依赖:商店信息获取）</span></td>
 	<td> <input type="radio" class="mod"  name="mod_craftProcess" checked value="1" />	</td>
 	<td> <input type="radio" class="mod"  name="mod_craftProcess" value="0" />	</td>
 </tr>
 <tr>
-	<td> <span >合成卡片监控（依赖商店信息获取）</span></td>
+	<td> <span >【综合Mod】合成卡片监控（依赖:商店信息获取）</span></td>
 	<td> <input type="radio" class="mod"  name="mod_craftFocus" checked value="1" />	</td>
 	<td> <input type="radio" class="mod"  name="mod_craftFocus" value="0" />	</td>
 </tr>
 <!-- 背包 XXXX_paf-->
 
 <tr>
-	<td> <span >合成材料监控（依赖商店信息获取、合成卡片监控、背包材料监控）</span></td>
+	<td> <span >【综合Mod】合成材料监控（依赖:商店信息获取、合成卡片监控、背包材料监控）</span></td>
 	<td> <input type="radio" class="mod"  name="mod_craftFocusItem" checked value="1" />	</td>
 	<td> <input type="radio" class="mod"  name="mod_craftFocusItem" value="0" />	</td>
 </tr>
@@ -139,49 +140,50 @@ Linodas Feygo V2 Extension Options:
 </tr>-->
 </table>
 <br>
-</table>
-<table border="1" width="290">
-	<tr>
-		<td>存储数据对象</td>
-		<td>操作方式</td>
-	</tr>
-	<tr>
-		<td>DB_OS_CITY_PVP</td>	
-		<td>
-			<button name="delObj" value="DB_OS_CITY_PVP">del</button>
-			<button name="clsObj" value="DB_OS_CITY_PVP">cls</button>
-		</td>
-	</tr>
-		<tr>
-		<td>DB_OS_SHOP_ALL</td>	
-		<td>
-			<button name="delObj" value="DB_OS_SHOP_ALL">del</button>
-			<button name="clsObj" value="DB_OS_SHOP_ALL">cls</button>
-		</td>
-	</tr>
-	<tr>
-		<td>DB_OS_SHOP_ITEM</td>	
-		<td>
-			<button name="delObj" value="DB_OS_SHOP_ITEM">del</button>
-			<button name="clsObj" value="DB_OS_SHOP_ITEM">cls</button>
-		</td>
-	</tr>	
-	<tr>
-		<td>DB_OS_SHOP_CARD</td>	
-		<td>
-			<button name="delObj" value="DB_OS_SHOP_CARD">del</button>
-			<button name="clsObj" value="DB_OS_SHOP_CARD">cls</button>
-		</td>
-	</tr>	
-	<tr>
-		<td>DB_OS_CRAFT_ITEM</td>	
-		<td>
-			<button name="delObj" value="DB_OS_CRAFT_ITEM">del</button>
-			<button name="clsObj" value="DB_OS_CRAFT_ITEM">cls</button>
-		</td>
-	</tr>		 
-</table>
 
+<div id="dataDiv">
+	<table border="1" width="290">
+		<tr>
+			<td>存储数据对象</td>
+			<td>操作方式</td>
+		</tr>
+		<tr>
+			<td>DB_OS_CITY_PVP</td>	
+			<td>
+				<button name="delObj" value="DB_OS_CITY_PVP">del</button>
+				<button name="clsObj" value="DB_OS_CITY_PVP">cls</button>
+			</td>
+		</tr>
+			<tr>
+			<td>DB_OS_SHOP_ALL</td>	
+			<td>
+				<button name="delObj" value="DB_OS_SHOP_ALL">del</button>
+				<button name="clsObj" value="DB_OS_SHOP_ALL">cls</button>
+			</td>
+		</tr>
+		<tr>
+			<td>DB_OS_SHOP_ITEM</td>	
+			<td>
+				<button name="delObj" value="DB_OS_SHOP_ITEM">del</button>
+				<button name="clsObj" value="DB_OS_SHOP_ITEM">cls</button>
+			</td>
+		</tr>	
+		<tr>
+			<td>DB_OS_SHOP_CARD</td>	
+			<td>
+				<button name="delObj" value="DB_OS_SHOP_CARD">del</button>
+				<button name="clsObj" value="DB_OS_SHOP_CARD">cls</button>
+			</td>
+		</tr>	
+		<tr>
+			<td>DB_OS_CRAFT_ITEM</td>	
+			<td>
+				<button name="delObj" value="DB_OS_CRAFT_ITEM">del</button>
+				<button name="clsObj" value="DB_OS_CRAFT_ITEM">cls</button>
+			</td>
+		</tr>		 
+	</table>
+</div>
 <button id="savebtn">Save</button>
 </div>
 <script type="text/javascript" src="./options.js"></script>
