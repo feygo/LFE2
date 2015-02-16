@@ -37,14 +37,14 @@ function handlePort_modInvFocus(port){
 var DB_OS_IF;
 var DB_IF;
 function success_DB_IF(db){
-	DB_OS_IF = DC[INVFOCUS_N].userOS;
+	DB_OS_IF = DC[INVFOCUS_N][0];
 	DB_IF = db;
 }
 /********************** 自动执行区**********************/
 var INVFOCUS_N="mod_invFocus";
 function csjLoad_mod_invFocus(){
 	chrome.runtime.onConnect.addListener(handlePort_modInvFocus);
-	Tool_connModDB(INVFOCUS_N,success_DB_IF);
+	Tool_connUserDB(success_DB_IF);
 }
 csjLoad_mod_invFocus();
 log("load csj_mod_invFocus.js done");

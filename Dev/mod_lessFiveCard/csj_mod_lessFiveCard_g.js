@@ -29,13 +29,13 @@ function handlePort_modLessFiveCard(port){
 var DB_OS_LFC;
 var DB_LFC_G;
 function success_DB_LFC_G(db){
-	DB_OS_LFC = DC[FIVECARD_N].userOS;
+	DB_OS_LFC = DC[FIVECARD_N][0];
 	DB_LFC_G = db;
 }
 /********************** 自动执行区**********************/
 var FIVECARD_N="mod_lessFiveCard";
 function csjLoad_mod_lessFiveCard_g(){
-	Tool_connModDB(FIVECARD_N,success_DB_LFC_G);
+	Tool_connUserDB(success_DB_LFC_G);
 	chrome.runtime.onConnect.addListener(handlePort_modLessFiveCard);
 }
 csjLoad_mod_lessFiveCard_g();

@@ -71,14 +71,14 @@ function focusCardAction(){
 var DB_OS_CF;
 var DB_CF_S;
 function success_DB_CF_S(db){
-	DB_OS_CF = DC[FOCUSCARD_N].userOS;
+	DB_OS_CF = DC[FOCUSCARD_N][0];
 	DB_CF_S = db;
 	checkFocusCard();
 }
 /********************** 自动执行区**********************/
 var FOCUSCARD_N="mod_craftFocus";
 function csjLoad_mod_cf_s(){
-	Tool_connModDB(FOCUSCARD_N,success_DB_CF_S);
+	Tool_connUserDB(success_DB_CF_S);
 }
 csjLoad_mod_cf_s();
 log("load csj_mod_craftFocus_s.js done");

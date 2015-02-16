@@ -315,7 +315,7 @@ function beginTrn(data){
 var DB_OS_TRNRS;
 var DB_TRN;
 function success_DB_TRN(db){
-	DB_OS_TRNRS = DC[TRN_N].userOS;
+	DB_OS_TRNRS = DC[TRN_N][0];
 	DB_TRN = db;
 }
 /********************** 通道消息 处理区**********************/
@@ -335,7 +335,7 @@ function handlePort_modTrn(port){
 var TRN_N="mod_train";
 function csjLoad_mod_trn(){
 	chrome.runtime.onConnect.addListener(handlePort_modTrn);
-	Tool_connModDB(TRN_N,success_DB_TRN);
+	Tool_connUserDB(success_DB_TRN);
 }
 csjLoad_mod_trn();
 

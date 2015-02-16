@@ -11,7 +11,7 @@ function loadModList(){
 		var conf=bg.MOD_NOW[modId];
 		bg.debug(conf["data"]);
 		if(conf["data"]){
-			addModListTD(rTable,modId,conf["mod"],conf["data"].toString());
+			addModListTD(rTable,modId,conf["mod"],conf["data"]);
 		}
 	}
 }
@@ -28,7 +28,8 @@ function addModListTitle(rTable){
 	tdT3.innerHTML="<b>操作</b>";
 	var tdT4=document.createElement("td");
 	tdT4.className='name c5';
-	tdT4.innerHTML="<b>结果</b>";
+	// tdT4.innerHTML="<b>结果</b>";
+	tdT4.innerHTML="<b></b>";
 	
 	trT.appendChild(tdT1);
 	trT.appendChild(tdT2);
@@ -43,7 +44,14 @@ function addModListTD(rTable,modId,modName,data){
 	td1.innerHTML=modName;
 	// DB名称
 	var td2=document.createElement("td");
-	td2.innerHTML=data;
+	var dataStr="";
+	for(var i=0;i<data.length;i++){
+		dataStr+=data[i];
+		if(i!=(data.length-1)){
+			dataStr+="<br>";
+		}
+	}
+	td2.innerHTML=dataStr;
 	// 操作
 	var td3=document.createElement("td");
 	var delBtn=document.createElement("button");
@@ -66,6 +74,9 @@ function del(){
 	var b=event.srcElement;	
 	port.postMessage({"cmd":"clsData","id":b.id});
 }
+function delDB(){
+	port.postMessage({"cmd":"delDB"});
+}
 function delStat(id,data){
 	var stat=document.getElementById("stat_"+id);
 	stat.innerText=data;
@@ -84,10 +95,14 @@ function loadPort(){
 			if (msg.cmd == "clsData.rs"){
 				delStat(msg.id,msg.data);
 			}
+			if (msg.cmd == "delData.rs"){
+				delStat(msg.id,msg.data);
+			}
 		});
 	});
 }
 /*************************** 绑定与自动执行区 *******************/
 window.addEventListener('load', loadPort);
+document.getElementById("delDBbtn").addEventListener('click', delDB);	
 
 bg.log("load pop_devMode.js done");

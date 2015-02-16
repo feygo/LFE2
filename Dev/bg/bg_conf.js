@@ -490,11 +490,11 @@ function bg_conf_RequestListener(msg, sender, sendResponse) {
 	if(msg.cmd=="isDebug"){
 		sendResponse({"res": EXT_CONF["devMode"]});			
 	}
-	if(msg.cmd=="idleDB"){
+	if(msg.cmd=="idleMod"){
 		var idleDBList=[];
 		for(var imod in MOD_IDLE){
 			if(MOD_IDLE[imod].data){
-				idleDBList.push(MOD_IDLE[imod].data);
+				idleDBList=idleDBList.concat(MOD_IDLE[imod].data);
 			}			
 		}
 		sendResponse({"res": idleDBList});			

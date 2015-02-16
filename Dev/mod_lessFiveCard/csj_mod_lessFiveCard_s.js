@@ -3,8 +3,8 @@
 // 更新不满足5张数量的卡片
 function saveLessFiveByShop(card){
 	if(DB_LFC_S==undefined){
-		Tool_connModDB(FIVECARD_N,function(db){
-			DB_OS_LFC = DC[FIVECARD_N].userOS;
+		Tool_connUserDB(function(db){
+			DB_OS_LFC = DC[FIVECARD_N][0];
 			DB_LFC_S = db;
 			saveLessFiveByShopEx(card);
 		});

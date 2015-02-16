@@ -3,9 +3,9 @@
 // 记录合成卡片的信息
 function saveCraftCardNum(card){
 	if(DB_CP_S==undefined){
-		Tool_connModDB(CP_N,function(db){
+		Tool_connUserDB(function(db){
 			DB_CP_S = db;
-			DB_OS_CP = DC[CP_N].userOS;
+			DB_OS_CP = DC[CP_N][0];
 			saveCraftCardNumEx(card);
 		});
 	}else{
@@ -35,5 +35,5 @@ function saveCraftCardNumEx(card){
 /************************ 数据预备区 **********************/
 var DB_OS_CP;
 var DB_CP_S;
-
+var CP_N="mod_craftProcess";
 log("load csj_mod_craftProcess_s.js done");

@@ -43,7 +43,7 @@ function clearFive(){
 var DB_LFC;
 var DB_OS_LFC;
 function success_DB_LFC(db){
-	DB_OS_LFC = DC[FIVECARD_N].userOS;
+	DB_OS_LFC = DC[FIVECARD_N][0];
 	DB_LFC = db;
 	loadLessFive();
 	clearFive();
@@ -51,7 +51,7 @@ function success_DB_LFC(db){
 /********************** 自动执行区**********************/
 var FIVECARD_N="mod_lessFiveCard";
 function csjLoad_mod_lessFiveCard_cc(){
-	Tool_connModDB(FIVECARD_N,success_DB_LFC);
+	Tool_connUserDB(success_DB_LFC);
 }
 csjLoad_mod_lessFiveCard_cc();
 log("load csj_mod_lessFiveCard_cc.js");

@@ -169,7 +169,7 @@ function setDeckInfo(cList){
 var DB_OS_Gear;
 var DB_MultDeck;
 function success_DB_MultDeck(db){
-	DB_OS_Gear = DC[MDECK_N].userOS;
+	DB_OS_Gear = DC[MDECK_N][0];
 	DB_MultDeck = db;
 }
 /********************** 通道消息 处理区**********************/
@@ -196,7 +196,7 @@ function handlePort_modMultDeck(port){
 var MDECK_N="mod_multDeck";
 function csjLoad_mod_multDeck(){
 	chrome.runtime.onConnect.addListener(handlePort_modMultDeck);
-	Tool_connModDB(MDECK_N,success_DB_MultDeck);
+	Tool_connUserDB(success_DB_MultDeck);
 }
 csjLoad_mod_multDeck();
 

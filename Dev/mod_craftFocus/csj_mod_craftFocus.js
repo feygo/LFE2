@@ -55,7 +55,7 @@ function checkFocusCard(cardId,port){
 var DB_OS_CF;
 var DB_CF;
 function success_DB_CF(db){
-	DB_OS_CF = DC[FOCUSCARD_N].userOS;
+	DB_OS_CF = DC[FOCUSCARD_N][0];
 	DB_CF = db;
 }
 /********************** 通道消息 处理区**********************/
@@ -79,7 +79,7 @@ function handlePort_modCraftFocus(port){
 var FOCUSCARD_N="mod_craftFocus";
 function csjLoad_mod_craftFocus(){
 	chrome.runtime.onConnect.addListener(handlePort_modCraftFocus);
-	Tool_connModDB(FOCUSCARD_N,success_DB_CF);
+	Tool_connUserDB(success_DB_CF);
 }
 csjLoad_mod_craftFocus();
 log("load csj_mod_craftFocus.js done");

@@ -49,14 +49,14 @@ function storeItem(){
 var DB_OS_IF;
 var DB_IF_CI;
 function success_DB_IF_CI(db){
-	DB_OS_IF = DC[INVFOCUS_N].userOS;
+	DB_OS_IF = DC[INVFOCUS_N][0];
 	DB_IF_CI = db;
 	storeItem();
 }
 /********************** 自动执行区**********************/
 var INVFOCUS_N="mod_invFocus";
 function csjLoad_mod_invFocus_ci(){
-	Tool_connModDB(INVFOCUS_N,success_DB_IF_CI);
+	Tool_connUserDB(success_DB_IF_CI);
 }
 csjLoad_mod_invFocus_ci();
 log("load csj_mod_invFocus_ci.js done");

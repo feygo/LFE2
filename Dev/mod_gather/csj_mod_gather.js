@@ -308,7 +308,7 @@ function beginGA(data){
 var DB_OS_GARS;
 var DB_GA;
 function success_DB_GA(db){
-	DB_OS_GARS = DC[GA_N].userOS;
+	DB_OS_GARS = DC[GA_N][0];
 	DB_GA = db;
 }
 /********************** 通道消息 处理区**********************/
@@ -329,7 +329,7 @@ function handlePort_modGA(port){
 var GA_N="mod_gather";
 function csjLoad_mod_ga(){
 	chrome.runtime.onConnect.addListener(handlePort_modGA);
-	Tool_connModDB(GA_N,success_DB_GA);
+	Tool_connUserDB(success_DB_GA);
 }
 csjLoad_mod_ga();
 

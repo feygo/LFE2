@@ -464,8 +464,8 @@ var DB_SortDeck;
 // 数据库连接之后 自动执行的函数
 function success_DB_SortDeck(db){
 	// 变量赋值
-	DB_OS_Sort = DC[SDECK_N].userOS[0];
-	DB_OS_SortConf = DC[SDECK_N].userOS[1];
+	DB_OS_Sort = DC[SDECK_N][0];
+	DB_OS_SortConf = DC[SDECK_N][1];
 	// 检查引擎版本
 	DB_SortDeck=db;
 	var trans=DB_SortDeck.transaction([DB_OS_SortConf,DB_OS_Sort], "readwrite");
@@ -641,7 +641,7 @@ function handlePort_modSortDeck(port){
 var SDECK_N="mod_sortDeck";
 function csjLoad_mod_sortDeck(){
 	chrome.runtime.onConnect.addListener(handlePort_modSortDeck);
-	Tool_connModDB(SDECK_N,success_DB_SortDeck);
+	Tool_connUserDB(success_DB_SortDeck);
 }
 csjLoad_mod_sortDeck();
 log("load csj_mod_sortDeck.js done");

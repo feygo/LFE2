@@ -1,25 +1,23 @@
 console.log("load main_data.js");
 /**********************辅助功能区***************************/
-// 检测MOD的配置，如果没有启用的mod会删除相应的数据库
+// 检测MOD的配置，如果没有启用的mod会清空相应的数据对象
 function checkIdleDB(){
-	var msg={"msg":{"type":"bg_conf","cmd":"idleDB"},
+	var msg={"msg":{"type":"bg_conf","cmd":"idleMod"},
 			"func":function(msg){
 					var idleDBList=msg.res;
-					console.log("清除无用的数据库："+idleDBList.length);
+					console.log("清空无用的数据对象："+idleDBList.length);
+					var dbName=DB_NAME_PRE+USER_NAME;
 					for(var i=0;i<idleDBList.length;i++){
-						Tool_delDB(idleDBList[i]);
+						Tool_clsOS(dbName,idleDBList[i]);
 					}
 				}
 			};
 	sendRequest(msg);
 }
 
-/**** ModDB 缓存
+/**** ModDB 缓存 在页面载入的时候初始化
 // "mod_gather":{
-	// "data":"LFE2#Mod#Gather",
-	// "preOS":"#gatherRS",
-	// "userOS":""
-	// "version":1
+	// "data":["LFE2#Mod#Gather"]
 // },
 *****/
 var DC={}
@@ -32,7 +30,8 @@ function getDataConf(){
 				// 写入缓存
 				DC=data;
 				debug(DC);
-				// 连接数据库
+				// 检查数据库
+				checkIdleDB();
 			}else{
 				error("未获得数据库配置信息");
 			}
@@ -56,7 +55,8 @@ function Tool_connUserDB(succFunc) {
 // 根据db名称、os名称获取数据库连接，正常情况
 function Tool_connDB(DB_NAME,version,succFunc) {
 	if (!window.indexedDB) {
-		alert("你的浏览器不支持IndexedDB，插件数据无法保存，请更新最新的chrome浏览器！")
+		alert("你的浏览器不支持IndexedDB，插件数据无法保存，请更新最新的chrome浏览器！");
+		return;
 	}
 	debug("准备连接数据库："+DB_NAME);
 	var req = window.indexedDB.open(DB_NAME,version);

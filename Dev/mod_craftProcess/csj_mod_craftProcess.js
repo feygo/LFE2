@@ -16,7 +16,7 @@ function getCardNum(craftId,port){
 var DB_OS_CP;
 var DB_CP;
 function success_DB_CP(db){
-	DB_OS_CP = DC[CP_N].userOS;
+	DB_OS_CP = DC[CP_N][0];
 	DB_CP = db;
 }
 /********************** 通道消息 处理区**********************/
@@ -35,7 +35,7 @@ function handlePort_modCraftProcess(port){
 var CP_N="mod_craftProcess";
 function csjLoad_mod_craftProcess(){
 	chrome.runtime.onConnect.addListener(handlePort_modCraftProcess);
-	Tool_connModDB(CP_N,success_DB_CP);
+	Tool_connUserDB(success_DB_CP);
 }
 csjLoad_mod_craftProcess();
 log("load csj_mod_craftProcess.js done");
