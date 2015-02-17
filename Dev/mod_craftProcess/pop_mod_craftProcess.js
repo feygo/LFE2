@@ -9,7 +9,7 @@ function loadPort(){
 	chrome.tabs.getSelected(function(tab){
 		tabId=tab.id;
 		port = chrome.tabs.connect(tab.id,{name: "mod_craftProcess"});
-		loadCraftShopList();
+		showShopList();
 		
 		/**
 		页面操作指令 消息结构：{"cmd":"loadDeck","dId":slt.value}
@@ -30,6 +30,9 @@ function loadPort(){
 				if(tmpCardCnt==cardCnt){
 					showCraftShopList();
 				}
+				// 对应商店列表 进行计数，并且更新cp值
+				
+				// 更新商店卡片的缓存
 			}
 		});
 		
@@ -42,80 +45,24 @@ function loadPort(){
 		}
 	});
 }
-
-/********************************* 页面载入区 扩展******************/
-// 当页面载入的时候，获取可选卡组项、怪物列表、行动点AP、上一次的训练结果    
-/**
-页面操作指令 消息结构：{"msgType":"c-card","opnType":"load"};
-						={"msgType":"c-card","opnType":"loadShop","sId":sn};
-						{"msgType":"c-card","opnType":"saveFocus","data":f};
-						
-						{"shopCnt":1,"cardCnt":33,"colShop":[{"sn":"瑞普斯的厄运实验室","sc":12,"uc":4,"cp":"33.33%"}]}	
-						"168":{"cardId":"168","cardName":"浸毒骨杖","cardLevel":"9","cardNum":"5"},
-*/
-
-var shopList=[];
-var shopCardRS={};
-var shopCnt=0;
-var cardCnt=0;
-//载入商店列表
-function loadCraftShopList(){
-	bg.Tool_getDB([bg.DB_OS_SHOP_ALL],function(evt){
-		var db = evt.currentTarget.result;
-		var txn=db.transaction([bg.DB_OS_SHOP_ALL,bg.DB_OS_SHOP_CARD], "readonly")
-		var os_shopAll=txn.objectStore(bg.DB_OS_SHOP_ALL);	
-		// 获取商店列表
-		var request = os_shopAll.index("type").openCursor(IDBKeyRange.only("合成工坊"));
-
-		request.onsuccess = function(evt) {
-			var cursor = request.result;
-			if(cursor){
-				var shopData=cursor.value;
-				var info=shopData.shopName+" "+shopData.shopLv+"@"+shopData.shopCity.toString();
-				shopList.push({"shopInfo":info,"shopId":shopData.shopId});
-				// 商店计数器
-				shopCnt++;
-				// 获取商店合成卡片信息
-				var cReq=txn.objectStore(bg.DB_OS_SHOP_CARD).index("shopId").openCursor(IDBKeyRange.only(shopData.shopId));
-				cReq.onsuccess=function(cevt){
-					var tmpCursor=cReq.result;
-					if(tmpCursor){
-						var sc=tmpCursor.value;
-						var craftId=sc.shopId+"-"+sc.cardId;
-						var shopCard={"craftId":"","cardId":"","cardName":"","lv":"","num":-1};
-						shopCard["craftId"]=craftId;
-						shopCard.cardId=sc.cardId;
-						shopCard.lv=sc.lv;
-						shopCard.cardName=sc.cardName;
-						if(shopCardRS[sc.shopId]){
-							shopCardRS[sc.shopId][sc.cardId]=shopCard;
-						}else{
-							shopCardRS[sc.shopId]={};
-							shopCardRS[sc.shopId][sc.cardId]=shopCard;
-						} 
-						// 从csj中获得卡片数量
-						//发送消息，获取合成卡片数量
-						port.postMessage({"cmd":"getCardNum","id":craftId});
-						// 卡片计数器
-						cardCnt++;	
-						
-						tmpCursor.continue();
-					}					
-				}				
-				cursor.continue();
-			}else{
-				// 页面展示
-				bg.debug("====合成商店列表====")
-				bg.debug(shopList);
-				bg.debug("====合成商店信息====")
-				bg.debug(shopCardRS);
-				bg.debug("商店数量："+shopCnt);
-			}
-		}
-	})
+/********************************* 重构区******************/
+// 显示商店列表页面
+function showShopList(){	
+	// 载入商店数量和合成卡片数量	
+	document.getElementById("sCnt").innerText=0;	
+	document.getElementById("cCnt").innerText=0;
+	// 载入商店列表
+	document.getElementById("shopList").innerHTML="";
+	addShopTitle();
+	loadShopList();
+	// if(shopList.length>10){
+		// rTable.style.height="400px";
+		// rTable.style.overflowY='scroll';		
+	// }
 }
 // 添加商店页面title
-function addShopTitle(rTable){
+function addShopTitle(){
+	var rTable=document.getElementById("shopList");
 	var trT=document.createElement("tr");				
 	var tdT1=document.createElement("td");
 	tdT1.className='name c5';
@@ -136,15 +83,19 @@ function addShopTitle(rTable){
 	rTable.appendChild(trT);
 }
 // 添加商店页面 列表项
-function addShopTr(rTable,si,sn,sc,uc,cp){
+function addShopTr(si,sn,sc,uc,cp){
+	var rTable=document.getElementById("shopList");
 	var tr1=document.createElement("tr");	
 	var td1=document.createElement("td");
 	td1.innerHTML="<button name='V' value='"+si+"'>V</button>"+sn;
 	var td2=document.createElement("td");
+	td2.id=si+"_sc";
 	td2.innerText=sc;
 	var td3=document.createElement("td");
+	td3.id=si+"_uc";
 	td3.innerText=uc;
 	var td4=document.createElement("td");
+	td4.id=si+"_cp";
 	td4.innerText=cp;
 	
 	tr1.appendChild(td1);
@@ -155,43 +106,69 @@ function addShopTr(rTable,si,sn,sc,uc,cp){
 	/*******************************绑定事件***********/
 	td1.querySelector('button').addEventListener('click', showCardList);
 }
-// 
-function showCraftShopList(){	
-	// 载入商店数量和合成卡片数量	
-	document.getElementById("sCnt").innerText=shopCnt;	
-	document.getElementById("cCnt").innerText=cardCnt;
-	// 载入商店列表
-	var rTable=document.getElementById("shopList");
-	rTable.innerHTML="";
-	addShopTitle(rTable);
-	
-	if(shopList.length>10){
-		rTable.style.height="400px";
-		rTable.style.overflowY='scroll';		
-	}
-	
-	for (var i=0;i<shopList.length;i++){
-		var shopId=shopList[i].shopId;
-		var shopNameInfo=shopList[i].shopInfo;
-		var shopCard=shopCardRS[shopId];
-		var sc_cnt=0;
-		var sc_unt=0;
-		for(var cId in shopCard){
-			var card=shopCard[cId];
-			sc_cnt++;
-			if(card.num==5){
-				sc_unt++;
+function cnt(name){
+	var tmp=parseInt(document.getElementById(name).innerText);
+	tmp++;
+	document.getElementById(name).innerText=tmp;
+}
+//载入商店列表
+function loadShopList(){
+	bg.Tool_getDB([bg.DB_OS_SHOP_ALL],function(evt){
+		var db = evt.currentTarget.result;
+		var txn=db.transaction([bg.DB_OS_SHOP_ALL,bg.DB_OS_SHOP_CARD], "readonly")
+		var os_shopAll=txn.objectStore(bg.DB_OS_SHOP_ALL);	
+		// 获取商店列表
+		var request = os_shopAll.index("type").openCursor(IDBKeyRange.only("合成工坊"));
+		request.onsuccess = function(evt) {
+			var cursor = request.result;
+			if(cursor){
+				var shopData=cursor.value;
+				var info=shopData.shopName+" "+shopData.shopLv+"@"+shopData.shopCity.toString();
+				// 添加商店列表信息
+				addShopTr(shopData.shopId,info,0,0,"-");
+				// 商店计数器
+				cnt("sCnt");
+				// 获取商店合成卡片信息
+				var cReq=txn.objectStore(bg.DB_OS_SHOP_CARD).index("shopId").openCursor(IDBKeyRange.only(shopData.shopId));
+				cReq.onsuccess=function(cevt){
+					var tmpCursor=cReq.result;
+					if(tmpCursor){
+						var sc=tmpCursor.value;
+						var shopCard={"cardId":"","cardName":"","lv":"","num":-1};
+						shopCard.cardId=sc.cardId;
+						shopCard.lv=sc.lv;
+						shopCard.cardName=sc.cardName;
+						if(shopCardRS[sc.shopId]){
+							shopCardRS[sc.shopId][sc.cardId]=shopCard;
+						}else{
+							shopCardRS[sc.shopId]={};
+							shopCardRS[sc.shopId][sc.cardId]=shopCard;
+						} 
+						// 从csj中获得卡片数量
+						//发送消息，获取合成卡片数量
+						// port.postMessage({"cmd":"getCardNum","id":sc.cardId,"data":sc.shopId});
+						// 商店卡片计数
+						cnt(sc.shopId+"_sc");
+						// 卡片计数器
+						cnt("cCnt");
+						// 继续循环
+						tmpCursor.continue();
+					}					
+				}				
+				cursor.continue();
 			}
 		}
-		var cp=Math.round(sc_unt/sc_cnt* 100) / 1.0 ;
-		if(sc_cnt==0){
-			sc_cnt=-1;
-		}
-		addShopTr(rTable,shopId,shopNameInfo,sc_cnt,sc_unt,cp+"%");
-	}
+	})
 }
+
+/********************************* 重构区******************/
+/********************************* 页面载入区 扩展******************/
+var shopCardRS={};
+var cardCnt=0;
+
 // 添加商店卡片页面的title
-function addCardTitle(sTable){
+function addCardTitle(){
+	var sTable=document.getElementById("shop");
 	// 组成table 表头
 	var trT=document.createElement("tr");				
 	var tdT1=document.createElement("td");
@@ -216,9 +193,9 @@ function addCardTitle(sTable){
 function showCardList(){
 	var shopId=window.event.srcElement.value;
 	// 商店的卡片列表，拥有该卡片的数量，是否列为监控目标
+	document.getElementById("shop").innerHTML="";
+	addCardTitle();
 	var sTable=document.getElementById("shop");
-	sTable.innerHTML="";
-	addCardTitle(sTable);
 	
 	var cnt=0;
 	// 生成卡片信息
