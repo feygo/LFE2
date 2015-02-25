@@ -198,6 +198,10 @@ console.log("load bg_conf.js");
 				{	"url":"#/city/classhall/id/*",
 					"js":["/mod_craftProcess/csj_mod_craftProcess_s.js"],
 					"pop":""
+				},
+				{	"url":"#/character/card",
+					"js":["/mod_craftProcess/csj_mod_craftProcess_cc.js"],
+					"pop":""
 				}
 		],
 		"data":["Mod#craftProcess#craftCard"]

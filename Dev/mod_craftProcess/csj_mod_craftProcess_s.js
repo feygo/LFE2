@@ -20,10 +20,9 @@ function saveCraftCardNumEx(card){
 		cardnum=parseInt(num.innerText);
 	}
 	// 组装对象
-	var cardData={"craftId":"","cardId":"","shopId":"","num":0};
+	var cardData={"cardId":"","shopId":"","num":0};
 	cardData.cardId=card.cardId;
 	cardData.shopId=card.shopId;
-	cardData.craftId=card.shopId+"-"+card.cardId;
 	cardData.num=cardnum;
 	
 	var objectStore=DB_CP_S.transaction([DB_OS_CP], "readwrite").objectStore(DB_OS_CP);

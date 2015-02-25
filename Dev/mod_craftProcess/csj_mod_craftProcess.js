@@ -1,14 +1,18 @@
 ﻿log("load csj_mod_craftProcess.js");
 
-function getCardNum(craftId,port){			
-	var objectStore=DB_CP.transaction([DB_OS_CP], "readonly").objectStore(DB_OS_CP);
-	var request = objectStore.get(craftId);
+function getCardNum(cardId,shopId,port){			
+	var objectStore=DB_CP.transaction([DB_OS_CP], "readwrite").objectStore(DB_OS_CP);
+	var request = objectStore.get(cardId);
 	request.onsuccess = function(evt) {
 		var cpData=evt.currentTarget.result;
 		if(cpData){
-			port.postMessage({"cmd":"getCardNum.rs","data":cpData.num,"id":cpData.craftId});
+			if(cpData.shopId==""){
+				cpData.shopId=shopId;
+				objectStore.put(cpData);
+			}
+			port.postMessage({"cmd":"getCardNum.rs","data":cpData.num,"shopId":shopId,"id":cpData.cardId});
 		}else{
-			port.postMessage({"cmd":"getCardNum.rs","data":-1,"id":craftId});
+			port.postMessage({"cmd":"getCardNum.rs","data":-1,"shopId":shopId,"id":cardId});
 		}
 	}
 }
@@ -25,8 +29,8 @@ function handlePort_modCraftProcess(port){
 		port.onMessage.addListener(function(msg) {
 			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "getCardNum"){
-				// craftId
-				getCardNum(msg.id,port);
+				// cardId
+				getCardNum(msg.id,msg.shopId,port);
 			}		
 		});
 	}

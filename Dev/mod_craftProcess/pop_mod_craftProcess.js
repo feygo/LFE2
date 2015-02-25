@@ -16,23 +16,19 @@ function loadPort(){
 		页面操作反馈 消息结构：{"rs":list};
 		*/
 		/** 业务功能区 */
-		var tmpCardCnt=0;
 		port.onMessage.addListener(function(msg) {
 			bg.debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "getCardNum.rs"){
-				var craftId=msg.id;
+				var cardId=msg.id;
 				var num=msg.data;
-				var tmp=craftId.split("-");
-				var shopId=tmp[0];
-				var cardId=tmp[1].replace("-","");
+				var shopId=msg.shopId;
+				// 更新卡片商店详细列表缓存
 				shopCardRS[shopId][cardId]["num"]=num;
-				tmpCardCnt++
-				if(tmpCardCnt==cardCnt){
-					showCraftShopList();
-				}
 				// 对应商店列表 进行计数，并且更新cp值
-				
-				// 更新商店卡片的缓存
+				if(num!=-1&&num!=0){
+					cnt(shopId+"_uc");
+					cp(shopId);					
+				}
 			}
 		});
 		
@@ -111,6 +107,13 @@ function cnt(name){
 	tmp++;
 	document.getElementById(name).innerText=tmp;
 }
+// 计算商店的合成完成度 cp值
+function cp(shopId){
+	var sc=parseInt(document.getElementById(shopId+"_sc").innerText);
+	var uc=parseInt(document.getElementById(shopId+"_uc").innerText);
+	var cp=Math.round(uc / sc * 10000) / 100.00 + "%";
+	document.getElementById(shopId+"_cp").innerText=cp;
+}
 //载入商店列表
 function loadShopList(){
 	bg.Tool_getDB([bg.DB_OS_SHOP_ALL],function(evt){
@@ -146,7 +149,7 @@ function loadShopList(){
 						} 
 						// 从csj中获得卡片数量
 						//发送消息，获取合成卡片数量
-						// port.postMessage({"cmd":"getCardNum","id":sc.cardId,"data":sc.shopId});
+						port.postMessage({"cmd":"getCardNum","id":sc.cardId,"shopId":sc.shopId});
 						// 商店卡片计数
 						cnt(sc.shopId+"_sc");
 						// 卡片计数器

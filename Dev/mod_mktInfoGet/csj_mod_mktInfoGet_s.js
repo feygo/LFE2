@@ -46,17 +46,18 @@ function getShopCraft(shopId,frm){
 			sendRequest({"msg":{"type":"bg_mod_mktInfoGet","cmd":"updateShopCard","data":cardData,"id":cardData.cardId}});	
 			
 			// 调用csj_mod_lessFiveCard_s.js文件中的不满5张的核查函数
-			if(saveLessFiveByShop!=undefined){
+			if(typeof(saveLessFiveByShop)=="function"){
 				saveLessFiveByShop(cardData);
 			}
 			
 			// csj_mod_craftProcess_s.js文件中的卡片信息的记录函数
-			if(saveCraftCardNum!=undefined){
+			if(typeof(saveCraftCardNum)=="function"){
 				saveCraftCardNum(cardData);
 			}
 			
 			// csj_mod_craftFocus_s.js文件中的卡片信息的记录函数
-			if(setFocusCardAction!=undefined){
+			// console.assert(setFocusCardAction==undefined);
+			if(typeof(setFocusCardAction)=="function"){
 				setFocusCardAction(cardData);
 			}
 			

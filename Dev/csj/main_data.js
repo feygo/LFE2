@@ -42,7 +42,6 @@ function getDataConf(){
 /**********************数据库操作区***************************/
 //  获取数据库连接的方法
 var DB_NAME_PRE="LFE2#";
-var VERSION=1;
 function Tool_connUserDB(succFunc) {
 	if(USER_NAME==""){
 		error("没有获得到用户名称，无法获得数据库连接");
@@ -165,6 +164,7 @@ function Tool_clsOS(DB_NAME,DB_OS_NAME){
 	}
 }
 /**********************数据结构定义区***************************/
+var VERSION=2;
 function upgrade(evt){
 	var db = evt.currentTarget.result;
 	// debug(db);
@@ -217,6 +217,11 @@ function upgrade(evt){
 		if (evt.oldVersion < 1) {
 			// {"craftId":"","cardId":"","shopId":"","num":0};
 			db.createObjectStore(DC["mod_craftProcess"][0], { keyPath: "craftId" });
+		}
+		if(evt.oldVersion < 2){
+			db.deleteObjectStore(DC["mod_craftProcess"][0]);
+			// {"cardId":"","shopId":"","num":0};
+			db.createObjectStore(DC["mod_craftProcess"][0], { keyPath: "cardId" });
 		}
 		debug("更新mod_craftProcess数据结构");		
 	}
