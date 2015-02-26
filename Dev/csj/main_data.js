@@ -71,50 +71,6 @@ function Tool_connDB(DB_NAME,version,succFunc) {
 		upgrade(evt)
 	};
 }
-/*** (不再使用的方法)根据db名称、os名称获取数据库连接
-function Tool_getDB(DB_NAME,OS_List,updateFunc,succFunc) {
-	if (!window.indexedDB) {
-		alert("你的浏览器不支持IndexedDB，插件数据无法保存，请更新最新的chrome浏览器！")
-	}
-	debug("initDb "+DB_NAME+"...");
-	var req = window.indexedDB.open(DB_NAME);
-	req.onsuccess = function (evt) {
-		var DB = this.result;
-		// log(DB);
-		// log(OS);
-		var isUpdate=false;
-		for(var i=0;i<OS_List.length;i++){
-			if(!DB.objectStoreNames.contains(OS_List[i])){
-				debug(OS_List[i]);
-				isUpdate=true;
-			}			
-		}
-		if(isUpdate){
-			var newVer=DB.version+1;
-			DB.close();
-			var newreq=window.indexedDB.open(DB_NAME,newVer);
-			debug("initDb "+DB_NAME+" update version:"+newVer);	
-			newreq.onupgradeneeded = function (evt) {		
-				updateFunc(evt);
-				debug("initDb.onupgradeneeded");
-			};
-			newreq.onsuccess = function (evt) {
-				DB = this.result;
-				debug("initDb new "+DB_NAME+" DONE");
-				succFunc(evt);
-			}
-			newreq.onerror = function (evt) {
-				debug("initDb new error:"+evt.target.error.message);
-			};
-		}
-		debug("initDb "+DB_NAME+" DONE");		
-		succFunc(evt);
-	};
-	req.onerror = function (evt) {
-		debug("initDb:"+evt.target.error.message);
-	};
-}
-*****/
 // 删除数据库
 function Tool_delDB(DB_NAME){
 	var delReq=window.indexedDB.deleteDatabase(DB_NAME);
@@ -173,22 +129,22 @@ function upgrade(evt){
 		if (evt.oldVersion < 1) {
 			// {"rs":"","wp":"","zd":"","jn":"","note":"陌上开花缓缓归。"},
 			db.createObjectStore(DC["mod_gather"][0], { autoIncrement: true });
+			debug("更新mod_gather数据结构");		
 		}
-		debug("更新mod_gather数据结构");		
 	}
 	if(DC["mod_note"]!=undefined){
 		if (evt.oldVersion < 1) {
 			// {user:"",note:""}
 			db.createObjectStore(DC["mod_note"][0], { keyPath: "user" });
+			debug("更新mod_note数据结构");	
 		}
-		debug("更新mod_note数据结构");		
 	}
 	if(DC["mod_multDeck"]!=undefined){
 		if (evt.oldVersion < 1) {
 			// {"gearName":gn,"userCost":uc,"userSpi":us,"deckInfo":diList};
 			db.createObjectStore(DC["mod_multDeck"][0], { keyPath: "gearName" });
+			debug("更新mod_multDeck数据结构");	
 		}
-		debug("更新mod_multDeck数据结构");		
 	}
 	if(DC["mod_sortDeck"]!=undefined){
 		if (evt.oldVersion < 1) {
@@ -196,48 +152,49 @@ function upgrade(evt){
 			db.createObjectStore(DC["mod_sortDeck"][0], { keyPath: "id" });
 			// {"key":gn,"value":uc};
 			db.createObjectStore(DC["mod_sortDeck"][1], { keyPath: "key" });
+			debug("更新mod_sortDeck数据结构");	
 		}
-		debug("更新mod_sortDeck数据结构");		
 	}
 	if(DC["mod_train"]!=undefined){
 		if (evt.oldVersion < 1) {
 			// {"rs":"","jq":"","jy":"","jn":"","note":""};
 			db.createObjectStore(DC["mod_train"][0], { autoIncrement: true });
+			debug("更新mod_train数据结构");		
 		}
-		debug("更新mod_train数据结构");		
 	}
 	if(DC["mod_lessFiveCard"]!=undefined){
 		if (evt.oldVersion < 1) {
 			// 
 			db.createObjectStore(DC["mod_lessFiveCard"][0], { keyPath: "cardId" });
+			debug("更新mod_lessFiveCard数据结构");		
 		}
-		debug("更新mod_lessFiveCard数据结构");		
 	}
 	if(DC["mod_craftProcess"]!=undefined){
 		if (evt.oldVersion < 1) {
 			// {"craftId":"","cardId":"","shopId":"","num":0};
 			db.createObjectStore(DC["mod_craftProcess"][0], { keyPath: "craftId" });
+			debug("更新mod_craftProcess数据结构");	
 		}
 		if(evt.oldVersion < 2){
 			db.deleteObjectStore(DC["mod_craftProcess"][0]);
 			// {"cardId":"","shopId":"","num":0};
 			db.createObjectStore(DC["mod_craftProcess"][0], { keyPath: "cardId" });
-		}
-		debug("更新mod_craftProcess数据结构");		
+			debug("更新mod_craftProcess数据结构<2");	
+		}			
 	}
 	if(DC["mod_craftFocus"]!=undefined){
 		if (evt.oldVersion < 1) {
 			// {"cardId":"","cardName":"","num":0};
 			db.createObjectStore(DC["mod_craftFocus"][0], { keyPath: "cardId" });
+			debug("更新mod_craftFocus数据结构");		
 		}
-		debug("更新mod_craftFocus数据结构");		
 	}
 	if(DC["mod_invFocus"]!=undefined){
 		if (evt.oldVersion < 1) {
 			// {"itemId":"","itemName":"","norNum:":0,"lootNum:":0}
 			db.createObjectStore(DC["mod_invFocus"][0], { keyPath: "itemId" });
+			debug("更新mod_invFocus数据结构");		
 		}
-		debug("更新mod_invFocus数据结构");		
 	}
 }
 /**********************消息服务区***************************/
@@ -263,11 +220,12 @@ function clsData(modName){
 /**********************自动载入区***************************/
 function loadMainData(){
 	chrome.runtime.onConnect.addListener(handlePort_main);
+	log("当前数据库版本为 "+VERSION);
 	getDataConf();
 	// checkIdleDB();
 	// Tool_connModDB("mod_gather",function(){});
 	// Tool_connModDB("mod_gather",function(){});
 }
-// Tool_delDB("LFE2#百目鬼");
+// Tool_delDB("LFE2#");
 loadMainData();
 console.log("load main_data.js done");

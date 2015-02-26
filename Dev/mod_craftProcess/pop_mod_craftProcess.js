@@ -26,6 +26,7 @@ function loadPort(){
 				shopCardRS[shopId][cardId]["num"]=num;
 				// 对应商店列表 进行计数，并且更新cp值
 				if(num!=-1&&num!=0){
+					cnt("uCnt");
 					cnt(shopId+"_uc");
 					cp(shopId);					
 				}
@@ -47,6 +48,7 @@ function showShopList(){
 	// 载入商店数量和合成卡片数量	
 	document.getElementById("sCnt").innerText=0;	
 	document.getElementById("cCnt").innerText=0;
+	document.getElementById("uCnt").innerText=0;
 	// 载入商店列表
 	document.getElementById("shopList").innerHTML="";
 	addShopTitle();

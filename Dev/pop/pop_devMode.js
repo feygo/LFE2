@@ -75,7 +75,9 @@ function del(){
 	port.postMessage({"cmd":"clsData","id":b.id});
 }
 function delDB(){
-	port.postMessage({"cmd":"delDB"});
+	if(confirm("是否要清除该用户的本地所有数据")){
+		port.postMessage({"cmd":"delDB"});		
+	}
 }
 function delStat(id,data){
 	var stat=document.getElementById("stat_"+id);

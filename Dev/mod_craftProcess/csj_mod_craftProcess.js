@@ -6,9 +6,12 @@ function getCardNum(cardId,shopId,port){
 	request.onsuccess = function(evt) {
 		var cpData=evt.currentTarget.result;
 		if(cpData){
-			if(cpData.shopId==""){
+			if(cpData.shopId==undefined||cpData.shopId==""){
 				cpData.shopId=shopId;
-				objectStore.put(cpData);
+				var putReq=objectStore.put(cpData);
+				putReq.onsuccess=function(evt){
+					debug("合成卡片更新商店信息");
+				}
 			}
 			port.postMessage({"cmd":"getCardNum.rs","data":cpData.num,"shopId":shopId,"id":cpData.cardId});
 		}else{
