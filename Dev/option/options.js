@@ -61,9 +61,9 @@ function restore_options() {
 		for(var lfeName in lfe){
 			rChecked(lfeName,lfe[lfeName]);		
 		}	
-	}
-	// 恢复数据对象操作 显示
-	showDataDiv(lfe["devMode"]);
+		// 恢复数据对象操作 显示
+		showDataDiv(lfe["devMode"]);
+	}	
 	// 恢复mod配置	
 	var modStr=localStorage.getItem("LFE#Mod");
 	console.log("恢复功能：LFE#Mod "+modStr);	
