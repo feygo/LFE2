@@ -43,7 +43,7 @@ console.log("load bg_conf.js");
 		"urlist":[
 				{	"url":"#/*",
 					"js":["/mod_note/csj_mod_note.js"],
-					"pop":"记事本:/mod_note/pop_mod_note.html"
+					"pop":"10:记事本:/mod_note/pop_mod_note.html"
 				}
 		],
 		"data":["Mod#Note#note"]
@@ -56,11 +56,11 @@ console.log("load bg_conf.js");
 		"urlist":[
 				{	"url":"#/character/deck",
 					"js":["/mod_multDeck/csj_mod_multDeck.js"],
-					"pop":"多卡组:/mod_multDeck/pop_mod_multDeck.html"
+					"pop":"60:多卡组:/mod_multDeck/pop_mod_multDeck.html"
 				},
 				{	"url":"#/character/deck/*",
 					"js":["/mod_multDeck/csj_mod_multDeck.js"],
-					"pop":"多卡组:/mod_multDeck/pop_mod_multDeck.html"
+					"pop":"60:多卡组:/mod_multDeck/pop_mod_multDeck.html"
 				}
 		],
 		"data":["Mod#MultDeck#gear"]
@@ -73,11 +73,11 @@ console.log("load bg_conf.js");
 		"urlist":[
 				{	"url":"#/character/deck",
 					"js":["/mod_sortDeck/csj_mod_sortDeck.js"],
-					"pop":"排序卡组:/mod_sortDeck/pop_mod_sortDeck.html"
+					"pop":"61:排序卡组:/mod_sortDeck/pop_mod_sortDeck.html"
 				},
 				{	"url":"#/character/deck/*",
 					"js":["/mod_sortDeck/csj_mod_sortDeck.js"],
-					"pop":"排序卡组:/mod_sortDeck/pop_mod_sortDeck.html"
+					"pop":"61:排序卡组:/mod_sortDeck/pop_mod_sortDeck.html"
 				}
 		],
 		"data":["Mod#SortDeck#sort","Mod#SortDeck#sortConf"]
@@ -90,7 +90,7 @@ console.log("load bg_conf.js");
 		"urlist":[
 				{	"url":"#/city/gathering",
 					"js":["/mod_gather/csj_mod_gather.js"],
-					"pop":"采集:/mod_gather/pop_mod_gather.html"
+					"pop":"65:采集:/mod_gather/pop_mod_gather.html"
 				}
 		],
 		"data":["Mod#Gather#gatherRS"]
@@ -105,7 +105,7 @@ console.log("load bg_conf.js");
 		"urlist":[
 				{	"url":"#/city/training",
 					"js":["/mod_train/csj_mod_train.js"],
-					"pop":"训练:/mod_train/pop_mod_train.html"
+					"pop":"66:训练:/mod_train/pop_mod_train.html"
 				}
 		],
 		"data":["Mod#Train#trainRS"]
@@ -163,11 +163,11 @@ console.log("load bg_conf.js");
 		"urlist":[
 				{	"url":"#/character/card",
 					"js":["/mod_lessFiveCard/csj_mod_lessFiveCard_cc.js","/mod_lessFiveCard/csj_mod_lessFiveCard_g.js"],
-					"pop":"不满5张:/mod_lessFiveCard/pop_mod_lessFiveCard.html"
+					"pop":"15:不满5张:/mod_lessFiveCard/pop_mod_lessFiveCard.html"
 				},
 				{	"url":"#/*",
 					"js":["/mod_lessFiveCard/csj_mod_lessFiveCard_g.js"],
-					"pop":"不满5张:/mod_lessFiveCard/pop_mod_lessFiveCard.html"
+					"pop":"15:不满5张:/mod_lessFiveCard/pop_mod_lessFiveCard.html"
 				},
 				{	"url":"#/market/shop/id/*",
 					"js":["/mod_lessFiveCard/csj_mod_lessFiveCard_s.js"],
@@ -189,7 +189,7 @@ console.log("load bg_conf.js");
 		"urlist":[
 				{	"url":"#/*",
 					"js":["/mod_craftProcess/csj_mod_craftProcess.js"],
-					"pop":"合成卡片:/mod_craftProcess/pop_mod_craftProcess.html"
+					"pop":"21:合成卡片:/mod_craftProcess/pop_mod_craftProcess.html"
 				},
 				{	"url":"#/market/shop/id/*",
 					"js":["/mod_craftProcess/csj_mod_craftProcess_s.js"],
@@ -214,7 +214,7 @@ console.log("load bg_conf.js");
 		"urlist":[
 				{	"url":"#/*",
 					"js":["/mod_craftFocus/csj_mod_craftFocus.js"],
-					"pop":"监控卡片:/mod_craftFocus/pop_mod_craftFocus.html"
+					"pop":"22:监控卡片:/mod_craftFocus/pop_mod_craftFocus.html"
 				},
 				{	"url":"#/market/shop/id/*",
 					"js":["/mod_craftFocus/csj_mod_craftFocus_s.js"],
@@ -256,7 +256,7 @@ console.log("load bg_conf.js");
 		"urlist":[
 				{	"url":"#/*",
 					"js":[],
-					"pop":"监控材料:/mod_craftFocusItem/pop_mod_craftFocusItem.html"
+					"pop":"23:监控材料:/mod_craftFocusItem/pop_mod_craftFocusItem.html"
 				}
 		]
 	}
@@ -454,7 +454,13 @@ function getScriptByURL(cp){
 	return getModConfByUrl(cp,"js");
 }
 function getPopByURL(cp){
-	return getModConfByUrl(cp,"pop");
+	var popList=getModConfByUrl(cp,"pop");
+	return popList.sort(popSorter);
+}
+function popSorter(a,b){
+	var as=a.substring(0,a.indexOf(":"));
+	var bs=b.substring(0,a.indexOf(":"));
+	return as-bs;
 }
 /**************************刷新 bg 载入脚本***********************/
 // 向bg.html页面动态载入js文件

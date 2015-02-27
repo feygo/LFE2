@@ -39,4 +39,4 @@ function csjLoad_mod_lessFiveCard_g(){
 	chrome.runtime.onConnect.addListener(handlePort_modLessFiveCard);
 }
 csjLoad_mod_lessFiveCard_g();
-log("load csj_mod_lessFiveCard_g.js");
+log("load csj_mod_lessFiveCard_g.js done");

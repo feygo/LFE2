@@ -18,7 +18,7 @@ chrome.tabs.getSelected(function(tab){
 	}else{
 		for(var i=0;i<popList.length;i++){
 			var popStr=popList[i].split(":");
-			addTabButton(popStr[1],popStr[0]);
+			addTabButton(popStr[2],popStr[1]);
 		}
 	}
 	if(checkDevMode()=="1"){

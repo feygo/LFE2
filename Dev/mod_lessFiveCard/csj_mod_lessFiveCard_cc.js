@@ -54,4 +54,4 @@ function csjLoad_mod_lessFiveCard_cc(){
 	Tool_connUserDB(success_DB_LFC);
 }
 csjLoad_mod_lessFiveCard_cc();
-log("load csj_mod_lessFiveCard_cc.js");
+log("load csj_mod_lessFiveCard_cc.js done");

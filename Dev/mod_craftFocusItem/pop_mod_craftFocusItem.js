@@ -268,7 +268,7 @@ function updateItemToCardStat(id,itemNum){
 	var reqItemList=document.getElementsByName("craftItem"+id);
 	for(var i=0;i<reqItemList.length;i++){
 		reqItemList[i].dataset.bagNum=itemNum;
-		var cnum=itemNum/reqItemList[i].dataset.reqNum;
+		var cnum=Math.floor(itemNum/reqItemList[i].dataset.reqNum);
 		// 更新对应卡片的状态
 		var stat=reqItemList[i].parentElement;
 		
@@ -292,7 +292,7 @@ function checkCardStat(){
 		var tmpC=0,tmpT=0;
 		for(var itemId in riData){		
 			var num=riData[itemId];
-			if(num!="-1"&&num!="0"){
+			if(num!=-1&&num!=0&&num!="0"){
 				if(hcNum>num){
 					hcNum=num;
 				}
@@ -482,12 +482,13 @@ function pickupItem(itemId,lootNum) {
 };
 function showPickStat(res){
 	var stat=document.getElementById("pickStat");
-	var tmp=document.createElement("font");
-	tmp.innerHTML=res.text+";<br>";	
+	var tmp=document.createElement("font");	
 	if(res.success){
 		tmp.color="green";
+		tmp.innerHTML=res.text+"<br>";	
 	}else{
 		tmp.color="red";	
+		tmp.innerHTML=res.msg+"<br>";	
 	}
 	stat.appendChild(tmp);	
 }
