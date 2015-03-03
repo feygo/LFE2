@@ -42,7 +42,7 @@ console.log("load bg_conf.js");
 		"bg":[],
 		"urlist":[
 				{	"url":"#/*",
-					"js":["/mod_note/csj_mod_note.js"],
+					"js":[],
 					"pop":"10:记事本:/mod_note/pop_mod_note.html"
 				}
 		],
@@ -52,7 +52,7 @@ console.log("load bg_conf.js");
 		"mod":"多卡组",
 		"modconf":{},
 		"dept":[],
-		"bg":[],
+		"bg":["bg_mod_multDeck.js"],
 		"urlist":[
 				{	"url":"#/character/deck",
 					"js":["/mod_multDeck/csj_mod_multDeck.js"],

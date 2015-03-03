@@ -19,5 +19,17 @@ function sendRequest(m){
 	});
 }
 /********************** 通道消息 处理区**********************/
-
+/********************** 通道消息 处理区**********************/
+function handlePort_main(port){	
+	if(port.name == "MAIN"){
+		port.onMessage.addListener(function(msg) {
+			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+			if (msg.cmd == "getUserName"){
+				port.postMessage({"cmd":"getUserName.rs","data":USER_NAME});
+			}
+		});
+	}
+}
+/********************** 自动执行区**********************/
+chrome.runtime.onConnect.addListener(handlePort_main);
 console.log("load main-msg.js done");

@@ -3,6 +3,9 @@ console.log("load bg_tools.js");
 function log(e){
 	console.log(e);
 }
+function error(e){
+	console.error(e);
+}
 //debug 应是模块使用的函数
 function debug(e){
 	if(EXT_CONF["devMode"]=="1"){
