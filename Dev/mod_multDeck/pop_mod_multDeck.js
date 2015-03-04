@@ -18,7 +18,7 @@ function loadPort(){
 			if (msg.cmd == "rs"){
 				document.getElementById("rsDiv").innerText=msg.data;
 				//刷新卡组列表
-				loadList();
+				// loadList();
 			}	
 			if (msg.cmd == "loadList.rs"){
 				var list=msg.data;

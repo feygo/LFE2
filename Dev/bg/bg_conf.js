@@ -52,7 +52,7 @@ console.log("load bg_conf.js");
 		"mod":"多卡组",
 		"modconf":{},
 		"dept":[],
-		"bg":["bg_mod_multDeck.js"],
+		"bg":["../mod_multDeck/bg_mod_multDeck.js"],
 		"urlist":[
 				{	"url":"#/character/deck",
 					"js":["/mod_multDeck/csj_mod_multDeck.js"],

@@ -149,7 +149,19 @@ function Tool_connDB(dbName,version,updateFunc,succFunc) {
 		updateFunc(evt)
 	};
 }
-
+/**********************Mod 连接池区***************************/
+var DB_POOL={}
+function Tool_getConn(userName,succFunc){
+	if(DB_POOL[userName]!=undefined){
+		succFunc(DB_POOL[userName]);
+	}else{
+		Tool_connUserDB(userName,function(db){
+			DB_POOL[userName]=db;
+			succFunc(db);
+			debug(DB_POOL);
+		})
+	}
+}
 /**********************Mod 数据结构 定义区***************************/
 var VERSION=1;
 function modUpdate(evt){

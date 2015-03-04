@@ -18,8 +18,21 @@ function sendRequest(m){
 		}
 	});
 }
-/********************** 通道消息 处理区**********************/
-/********************** 通道消息 处理区**********************/
+/**********************与bg通道消息 处理区**********************/
+var PORT_BG={}
+function getBgPort(modName){
+	if(PORT_BG[modName]!=undefined){
+		return PORT_BG[modName];
+	}else{
+		var port=chrome.runtime.connect({name: "BG#"+modName});
+		port.onMessage.addListener(function(msg) {
+			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+		});
+		PORT_BG[modName]=port;
+		return PORT_BG[modName];
+	}
+}
+/**********************对外 通道消息 处理区**********************/
 function handlePort_main(port){	
 	if(port.name == "MAIN"){
 		port.onMessage.addListener(function(msg) {
