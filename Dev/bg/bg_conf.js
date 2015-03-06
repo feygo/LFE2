@@ -39,7 +39,7 @@ console.log("load bg_conf.js");
 		"mod":"记事本",
 		"modconf":{},
 		"dept":[],
-		"bg":[],
+		"bg":["../mod_note/bg_mod_note.js"],
 		"urlist":[
 				{	"url":"#/*",
 					"js":[],

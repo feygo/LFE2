@@ -71,21 +71,15 @@ function loadList(userName,port){
 }
 
 /***********************************多卡组  功能区  结束******************************************/
-/************************ 数据预备区 **********************/
 
-var DB_MultDeck;
-function success_DB_MultDeck(db){
-	DB_OS_Gear = DC[MDECK_N][0];
-	DB_MultDeck = db;
-}
 /********************** 通道消息 处理区**********************/
 /**
 "cmd":"loadDeck","data":slt.value
 **/
 function handlePort_modMultDeck(port){	
-	if(port.name == "BG#"+MDECK_N){
+	if(port.name == "BG#"+MN_MDeck){
 		port.onMessage.addListener(function(msg) {
-			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+			debug("BG收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "bg.saveDeck"){
 				saveDeck(msg.un,msg.data,port);			
 			}
@@ -102,8 +96,8 @@ function handlePort_modMultDeck(port){
 	}
 }
 /********************** 自动执行区**********************/
-var MDECK_N="mod_multDeck";
-var DB_OS_Gear= MOD_DEF[MDECK_N].data[0];
+var MN_MDeck="mod_multDeck";
+var DB_OS_Gear= MOD_DEF[MN_MDeck].data[0];
 
 chrome.runtime.onConnect.addListener(handlePort_modMultDeck);
 

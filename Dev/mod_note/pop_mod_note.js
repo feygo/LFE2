@@ -8,24 +8,19 @@ function saveRecord(){
 	var rec=document.getElementById("records").value;
 	//存储数据
 	var note={"user":userName,"note":rec};
-	var objectStore = DB_Note.transaction([DB_OS_Note], "readwrite").objectStore(DB_OS_Note);
-	var requestUpdate = objectStore.put(note);
-	requestUpdate.onerror = function(event) {
-		bg.error("更新记事本数据出错:"+evt.target.error.message);
-	};	
+	var msg={"cmd":"bg.saveRecord","un":userName,"data":note};
+	port_bg.postMessage(msg);
 }
 // 载入记事本数据
 function loadRecord(){
-	var request = DB_Note.transaction([DB_OS_Note], "readonly").objectStore(DB_OS_Note).get(userName);
-	request.onsuccess = function(evt){
-		var data=evt.target.result;
-		if(data){
-			document.getElementById("records").value=data.note;
-		}else{
-			document.getElementById("records").value="";
+	var msg={"cmd":"bg.loadRecord","un":userName,"id":userName};
+	port_bg.postMessage(msg);
+	port_bg.onMessage.addListener(function(msg) {
+		if (msg.cmd == "bg.loadRecord.rs"){
+			document.getElementById("records").value=msg.data;
+			autoResize();
 		}
-		autoResize();
-	}
+	});	
 }
 
 // 最小高度
@@ -70,32 +65,16 @@ function autoResize(){
 }
 
 /**************自动执行区*********************/
-var port;
-var userName;
-function loadPort(){
-	chrome.tabs.getSelected(function(tab){
-		port = chrome.tabs.connect(tab.id,{name: "MAIN"});
-		port.postMessage({"cmd":"getUserName"});
-		port.onMessage.addListener(function(msg) {
-			bg.debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
-			if (msg.cmd == "getUserName.rs"){
-				if(msg.data!=""){
-					userName=msg.data;
-					bg.Tool_connUserDB(userName,success_DB_Note);
-				}
-			}			
-		});
-	});
-}
-var DB_OS_Note;
-var DB_Note;
 var modName="mod_note";
-function success_DB_Note(db){
-	DB_OS_Note = bg.MOD_DEF[modName].data[0];
-	DB_Note = db;
+var userName=bg.Tool_getUserName(location.search);
+var port_bg;
+function loadPort(){	
+	port_bg=chrome.runtime.connect({name: "BG#"+modName});
+	port_bg.onMessage.addListener(function(msg) {
+		bg.debug("pop_"+modName+"收到"+port_bg.name+"通道消息："+JSON.stringify(msg));	
+	});		
 	loadRecord();
 }
-
 /**************窗体事件区*********************/
 document.querySelector('#records').addEventListener('propertychange', saveRecord);
 document.querySelector('#records').addEventListener('input', saveRecord);

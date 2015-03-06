@@ -2,7 +2,7 @@ log("load csj_mod_multDeck.js");
 
 /***********************************多卡组  功能区  开始******************************************/
 // 存储卡组
-function saveDeck(port_pop){
+function saveDeck(){
 	// 获取页面数据	
 	var gn=getGearName();
 	var uc=getUserCost();
@@ -17,16 +17,16 @@ function saveDeck(port_pop){
 		if (msg.cmd == "bg.saveDeck.rs"){	
 			if(msg.stat=="success"){
 				var info="卡组保存成功:"+msg.data;
-				port_pop.postMessage({"cmd":"rs","data":info});				
+				MDECK_N_port.postMessage({"cmd":"saveDeck.rs","data":info});				
 			}else{
 				var info="卡组保存出错:"+msg.data;
-				port_pop.postMessage({"cmd":"rs","data":info});				
+				MDECK_N_port.postMessage({"cmd":"saveDeck.rs","data":info});				
 			}
 		}			
 	});
 }
 // 载入卡组
-function loadDeck(gn,port_pop){
+function loadDeck(gn){
 	var port_bg=getBgPort(MDECK_N);
 	port_bg.postMessage({"cmd":"bg.loadDeck","un":USER_NAME,"id":gn});
 	port_bg.onMessage.addListener(function(msg) {
@@ -39,49 +39,15 @@ function loadDeck(gn,port_pop){
 				setUserSpi(gearData.userSpi);
 				setDeckInfo(gearData.deckInfo);
 				var info="卡组载入成功:"+gearData.gearName;
-				port_pop.postMessage({"cmd":"rs","data":info});				
+				MDECK_N_port.postMessage({"cmd":"loadDeck.rs","data":info});				
 			}else{
 				var info="卡组载入出错:"+msg.data;
-				port_pop.postMessage({"cmd":"rs","data":info});				
+				MDECK_N_port.postMessage({"cmd":"loadDeck.rs","data":info});				
 			}
 		}			
 	});
 	
 }
-// 删除卡组信息
-function delDeck(gn,port_pop){
-	var port_bg=getBgPort(MDECK_N);
-	port_bg.postMessage({"cmd":"bg.delDeck","un":USER_NAME,"id":gn});
-	port_bg.onMessage.addListener(function(msg) {
-		if (msg.cmd == "bg.delDeck.rs"){	
-			if(msg.stat=="success"){
-				var info="卡组删除成功:"+msg.data;
-				port_pop.postMessage({"cmd":"rs","data":info});				
-			}else{
-				var info="卡组删除出错:"+msg.data;
-				port_pop.postMessage({"cmd":"rs","data":info});				
-			}
-		}			
-	});
-}
-// 卡组列表载入
-function loadList(port_pop){
-	var port_bg=getBgPort(MDECK_N);
-	port_bg.postMessage({"cmd":"bg.loadList","un":USER_NAME});
-	port_bg.onMessage.addListener(function(msg) {
-		if (msg.cmd == "bg.loadList.rs"){	
-			if(msg.stat=="success"){
-				var info="卡组列表读取11:"+msg.data;
-				// debug(info);
-				// port_pop.postMessage({"cmd":"loadList.rs","data":msg.data});				
-			}else{
-				var info="卡组列表读取出错:"+msg.data;
-				port_pop.postMessage({"cmd":"loadList.rs","data":info});				
-			}
-		}
-	});
-}
-
 /************************ 界面操作功能区 **********************/
 function getGearName(){
 	var gr=document.getElementsByName("gear_rename");
@@ -170,27 +136,22 @@ function setDeckInfo(cList){
 **/
 function handlePort_modMultDeck(port){	
 	if(port.name == MDECK_N){
-		port.onMessage.addListener(function(msg) {
-			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+		MDECK_N_port=port;
+		MDECK_N_port.onMessage.addListener(function(msg) {
+			debug("收到"+MDECK_N_port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "saveDeck"){
-				saveDeck(port);				
+				saveDeck();				
 			}
 			if (msg.cmd == "loadDeck"){
-				loadDeck(msg.id,port);
-			}
-			if (msg.cmd == "delDeck"){
-				delDeck(msg.id,port);
-			}
-			if (msg.cmd == "loadList"){
-				loadList(port);
-			}			
+				loadDeck(msg.id);
+			}		
 		});
-		port.onDisconnect.addListener(function(msg) {debug(msg)});
+		// port.onDisconnect.addListener(function(msg) {debug(msg)});
 	}
 }
 /********************** 自动执行区**********************/
 var MDECK_N="mod_multDeck";
-
+var MDECK_N_port;
 chrome.runtime.onConnect.addListener(handlePort_modMultDeck);
 
 log("load csj_mod_multDeck.js done");

@@ -39,5 +39,25 @@ function Tool_arrayQC(list){
 	}
 	return re;
 }
+// 获取url的查询参数
+function Tool_getUrlSearch(url){
+	var obj={};   
+	if(url.indexOf("?") != -1){   
+		var str = url.substr(1); 
+		var strs = str.split("&");
+		for(var i = 0; i < strs.length; i ++){   
+			obj[strs[i].split("=")[0]]=decodeURI(strs[i].split("=")[1]);   
+		}
+	} 
+	return obj;
+}
+// 获取url的查询参数
+function Tool_getUserName(url){
+	var un=Tool_getUrlSearch(url)["un"];
+	if(un==undefined){
+		un="";
+	}
+	return un;
+}
 
 console.log("load bg_tools.js done");

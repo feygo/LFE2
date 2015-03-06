@@ -3,12 +3,24 @@ var bg = chrome.extension.getBackgroundPage();
 
 bg.log("load pop_main.js");
 /**************获得当前tab页面的url*********************/
+var cp;
 chrome.tabs.getSelected(function(tab){
 	// 获得当前的CP
 	var url=tab.url;
 	document.getElementById("tabId").value=tab.id;
-	var cp=url.replace("http://www.linodas.com","");
-	bg.debug(cp);
+	cp=url.replace(/http(|s):\/\/.*\.linodas\.com/gi,"");
+	bg.debug("获取上下文："+cp);
+	// 获取当前用户名称
+	var port = chrome.tabs.connect(tab.id,{name: "MAIN"});
+	port.postMessage({"cmd":"getUserName"});
+	port.onMessage.addListener(function(msg) {
+		if (msg.cmd == "getUserName.rs"){	
+			var userName=msg.data;
+			loadButton(userName,cp);
+		}			
+	});
+});
+function loadButton(userName){
 	// 获得cp对应的popup页面设置
 	var popList=bg.getPopByURL(cp);
 	bg.debug(popList);
@@ -18,14 +30,13 @@ chrome.tabs.getSelected(function(tab){
 	}else{
 		for(var i=0;i<popList.length;i++){
 			var popStr=popList[i].split(":");
-			addTabButton(popStr[2],popStr[1]);
+			addTabButton(popStr[2]+"?un="+encodeURI(userName),popStr[1]);
 		}
 	}
 	if(checkDevMode()=="1"){
 		showDevBtn();
-	}
-	
-});
+	}	
+}
 // 向导航框添加按钮
 function addTabButton(value,name){
 	var tr=document.querySelector("#modDiv tr");
