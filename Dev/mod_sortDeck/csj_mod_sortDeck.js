@@ -455,6 +455,7 @@ function doSortDeckEx(data){
 
 // 装载排序对象的容器，给SortList赋值，然后调用页面排序检测的动作
 function loadSorter(){
+	var port_bg=getBgPort(SDECK_N);
 	// 载入规则引擎
 	var scLen=sortConfig.length;
 	var tmpNum=0;
@@ -469,19 +470,13 @@ function loadSorter(){
 		tmp.regLog();	
 		tmp.data=[];
 		tmpMap[s.id]=tmp;
+		// 获取引擎数据
+		port_bg.postMessage({"cmd":"bg.getSortData","un":USER_NAME,"id":s.id});
 	}
-	var port_bg=getBgPort(SDECK_N);
-	debug(port_bg);
+
 	for(var id in tmpMap){
-		port_bg.postMessage({"cmd":"bg.getSortData","un":USER_NAME,"id":id});
-		port_bg.onMessage.addListener(function(msg) {
-			if (msg.cmd == "bg.getSortData.rs"){
-				debug(msg.data);
-				if(msg.stat=="success"){
-					
-				}
-			}			
-		});
+		
+
 		
 			// 写入sortList作为排序对象的容器
 			var tmpS=tmpMap[evt.target.result.id];
@@ -588,6 +583,12 @@ function csjLoad_mod_sortDeck(){
 			if(msg.stat=="success"){
 				// 检查引擎通过后，开始载入引擎
 				loadSorter();
+			}
+		}
+		if (msg.cmd == "bg.getSortData.rs"){
+			debug(msg.data);
+			if(msg.stat=="success"){
+				
 			}
 		}			
 	});

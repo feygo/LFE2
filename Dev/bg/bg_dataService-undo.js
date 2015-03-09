@@ -1,66 +1,64 @@
 log("load bg_mod_multDeck.js");
 
-/***********************************多卡组  功能区  开始******************************************/
-// 存储卡组
+/***********************************存储服务 功能区******************************************/
+// 存储
 function save(userName,osName,data,port){
 	Tool_getConn(userName,function(db){
 		var objectStore=db.transaction([osName], "readwrite").objectStore(osName);
 		var requestUpdate = objectStore.put(data);
 		requestUpdate.onsuccess = function(evt) {
-			port.postMessage({"cmd":"bg.saveDeck.rs","stat":"success","data":gearData.gearName});
+			port.postMessage({"cmd":"ds.save.rs","stat":"success"});
 		}
 		requestUpdate.onerror = function(evt) {
 			error(evt);
-			port.postMessage({"cmd":"bg.saveDeck.rs","stat":"error","data":evt.target.error.message});
+			port.postMessage({"cmd":"ds.save.rs","stat":"error","data":evt.target.error.message});
 		};			
 	});	
 }
-// 载入卡组
-function loadDeck(userName,gn,port){
+// 读取
+function get(userName,osName,id,port){
 	Tool_getConn(userName,function(db){
-			// 从db中读取卡组信息
-		var request = db.transaction([DB_OS_Gear], "readonly").objectStore(DB_OS_Gear).get(gn);
+		var request = db.transaction([osName], "readonly").objectStore(osName).get(id);
 		request.onsuccess = function(evt) {	
-			var gearData=evt.currentTarget.result;
-			if(gearData){
-				port.postMessage({"cmd":"bg.loadDeck.rs","stat":"success","data":gearData});				
+			var data=evt.currentTarget.result;
+			if(data){
+				port.postMessage({"cmd":"ds.get.rs","stat":"success","data":data});				
 			}else{
-				port.postMessage({"cmd":"bg.loadDeck.rs","stat":"error","data":gearData});
+				port.postMessage({"cmd":"ds.get.rs","stat":"error","data":null});
 			}
 		};
 		request.onerror =function(evt){
 			error(evt);
-			port.postMessage({"cmd":"bg.loadDeck.rs","stat":"error","data":evt.target.error.message});
+			port.postMessage({"cmd":"ds.get.rs","stat":"error","data":evt.target.error.message});
 		}	
 	});
 }
-// 删除卡组信息
-function delDeck(userName,gn,port){
+// 删除
+function del(userName,osName,id,port){
 	Tool_getConn(userName,function(db){
 		// 从db中读取卡组信息
-		var request = db.transaction([DB_OS_Gear], "readwrite").objectStore(DB_OS_Gear).delete(gn);
+		var request = db.transaction([osName], "readwrite").objectStore(osName).delete(id);
 		request.onsuccess = function(evt) {	
-			port.postMessage({"cmd":"bg.delDeck.rs","stat":"success","data":gn});
+			port.postMessage({"cmd":"ds.del.rs","stat":"success","data":id});
 		};
 		request.onerror =function(evt){
 			error(evt);
-			port.postMessage({"cmd":"bg.delDeck.rs","stat":"error","data":evt.target.error.message});
+			port.postMessage({"cmd":"ds.del.rs","stat":"error","data":evt.target.error.message});
 		}		
 	});
 }
-// 卡组列表载入
-function loadList(userName,port){
+// 查询
+function list(userName,osName,port){
 	Tool_getConn(userName,function(db){
-		var gnList=[];
-		var objectStore = db.transaction(DB_OS_Gear).objectStore(DB_OS_Gear);
+		var tmpList=[];
+		var objectStore = db.transaction(osName).objectStore(osName);
 		objectStore.openCursor().onsuccess = function(event) {
 			var cursor = event.target.result;
 			if (cursor) {
-				gnList.push(cursor.key);
+				tmpList.push(cursor.key);
 				cursor.continue();
 			}else {
-				debug("卡组列表读取："+gnList);
-				port.postMessage({"cmd":"bg.loadList.rs","stat":"success","data":gnList});
+				port.postMessage({"cmd":"bg.loadList.rs","stat":"success","data":tmpList});
 			}
 		};
 		objectStore.openCursor().onerror =function(evt){
