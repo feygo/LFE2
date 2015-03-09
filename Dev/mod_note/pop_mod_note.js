@@ -15,12 +15,6 @@ function saveRecord(){
 function loadRecord(){
 	var msg={"cmd":"bg.loadRecord","un":userName,"id":userName};
 	port_bg.postMessage(msg);
-	port_bg.onMessage.addListener(function(msg) {
-		if (msg.cmd == "bg.loadRecord.rs"){
-			document.getElementById("records").value=msg.data;
-			autoResize();
-		}
-	});	
 }
 
 // 最小高度
@@ -73,6 +67,12 @@ function loadPort(){
 	port_bg.onMessage.addListener(function(msg) {
 		bg.debug("pop_"+modName+"收到"+port_bg.name+"通道消息："+JSON.stringify(msg));	
 	});		
+	port_bg.onMessage.addListener(function(msg) {
+		if (msg.cmd == "bg.loadRecord.rs"){
+			document.getElementById("records").value=msg.data;
+			autoResize();
+		}
+	});	
 	loadRecord();
 }
 /**************窗体事件区*********************/

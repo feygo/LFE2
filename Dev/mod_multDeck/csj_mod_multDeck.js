@@ -13,40 +13,35 @@ function saveDeck(){
 	// 存储卡组到db
 	var port_bg=getBgPort(MDECK_N);
 	port_bg.postMessage({"cmd":"bg.saveDeck","un":USER_NAME,"data":gearData});
-	port_bg.onMessage.addListener(function(msg) {
-		if (msg.cmd == "bg.saveDeck.rs"){	
-			if(msg.stat=="success"){
-				var info="卡组保存成功:"+msg.data;
-				MDECK_N_port.postMessage({"cmd":"saveDeck.rs","data":info});				
-			}else{
-				var info="卡组保存出错:"+msg.data;
-				MDECK_N_port.postMessage({"cmd":"saveDeck.rs","data":info});				
-			}
-		}			
-	});
+}
+function handlePort_saveDeck(msg){
+	if(msg.stat=="success"){
+		var info="卡组保存成功:"+msg.data;
+		MDECK_N_port.postMessage({"cmd":"saveDeck.rs","data":info});				
+	}else{
+		var info="卡组保存出错:"+msg.data;
+		MDECK_N_port.postMessage({"cmd":"saveDeck.rs","data":info});				
+	}
 }
 // 载入卡组
 function loadDeck(gn){
 	var port_bg=getBgPort(MDECK_N);
 	port_bg.postMessage({"cmd":"bg.loadDeck","un":USER_NAME,"id":gn});
-	port_bg.onMessage.addListener(function(msg) {
-		if (msg.cmd == "bg.loadDeck.rs"){	
-			if(msg.stat=="success"){
-				var gearData=msg.data;
-				// 更新界面
-				setGearName(gearData.gearName);
-				setUserCost(gearData.userCost);
-				setUserSpi(gearData.userSpi);
-				setDeckInfo(gearData.deckInfo);
-				var info="卡组载入成功:"+gearData.gearName;
-				MDECK_N_port.postMessage({"cmd":"loadDeck.rs","data":info});				
-			}else{
-				var info="卡组载入出错:"+msg.data;
-				MDECK_N_port.postMessage({"cmd":"loadDeck.rs","data":info});				
-			}
-		}			
-	});
-	
+}
+function handlePort_loadDeck(msg){
+	if(msg.stat=="success"){
+		var gearData=msg.data;
+		// 更新界面
+		setGearName(gearData.gearName);
+		setUserCost(gearData.userCost);
+		setUserSpi(gearData.userSpi);
+		setDeckInfo(gearData.deckInfo);
+		var info="卡组载入成功:"+gearData.gearName;
+		MDECK_N_port.postMessage({"cmd":"loadDeck.rs","data":info});				
+	}else{
+		var info="卡组载入出错:"+msg.data;
+		MDECK_N_port.postMessage({"cmd":"loadDeck.rs","data":info});				
+	}	
 }
 /************************ 界面操作功能区 **********************/
 function getGearName(){
@@ -134,6 +129,7 @@ function setDeckInfo(cList){
 /**
 "cmd":"loadDeck","data":slt.value
 **/
+// 面向pop页面开放的port
 function handlePort_modMultDeck(port){	
 	if(port.name == MDECK_N){
 		MDECK_N_port=port;
@@ -149,9 +145,20 @@ function handlePort_modMultDeck(port){
 		// port.onDisconnect.addListener(function(msg) {debug(msg)});
 	}
 }
+// 用于处理bg的port
+function listener_modMultDeck(msg){
+	if (msg.cmd == "bg.saveDeck.rs"){	
+		handlePort_saveDeck(msg);
+	}
+	if (msg.cmd == "bg.loadDeck.rs"){	
+		handlePort_loadDeck(msg);
+	}
+}
+
 /********************** 自动执行区**********************/
 var MDECK_N="mod_multDeck";
 var MDECK_N_port;
 chrome.runtime.onConnect.addListener(handlePort_modMultDeck);
+getBgPort(MDECK_N).onMessage.addListener(listener_modMultDeck);
 
 log("load csj_mod_multDeck.js done");

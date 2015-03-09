@@ -17,7 +17,16 @@ function loadPort(){
 		port.onMessage.addListener(function(msg) {
 			bg.debug("pop_"+modName+"收到"+port.name+"通道消息："+JSON.stringify(msg));
 		});		
-		
+		port.onMessage.addListener(function(msg) {
+			if (msg.cmd == "saveDeck.rs"){
+				document.getElementById("rsDiv").innerText=msg.data;
+				//刷新卡组列表
+				loadList();
+			}
+			if (msg.cmd == "loadDeck.rs"){
+				document.getElementById("rsDiv").innerText=msg.data;
+			}
+		});
 	});
 }
 
@@ -26,13 +35,6 @@ function saveDeck(){
 	document.getElementById("rsDiv").innerText="";
 	var msg={"cmd":"saveDeck"};
 	port.postMessage(msg);
-	port.onMessage.addListener(function(msg) {
-		if (msg.cmd == "saveDeck.rs"){
-			document.getElementById("rsDiv").innerText=msg.data;
-			//刷新卡组列表
-			loadList();
-		}
-	});	
 }
 // 将选定的卡组装载到页面中
 function loadDeck(){
@@ -40,11 +42,6 @@ function loadDeck(){
 	var slt=document.getElementById("deck_list");
 	var msg={"cmd":"loadDeck","id":slt.value};
 	port.postMessage(msg);
-	port.onMessage.addListener(function(msg) {
-		if (msg.cmd == "loadDeck.rs"){
-			document.getElementById("rsDiv").innerText=msg.data;
-		}
-	});	
 }
 // 删除将选定的卡组
 function delDeck(){

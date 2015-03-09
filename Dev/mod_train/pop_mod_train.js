@@ -1,19 +1,34 @@
 ﻿/** 后台通讯区 */
+var modName="mod_train";
 var bg = chrome.extension.getBackgroundPage();   
 bg.log("popup load pop_mod_train.js");
 /*********************** 页面通道 通讯区 *********************/
+var userName=bg.Tool_getUserName(location.search);
 var port;
+var port_bg;
 function loadPort(){
+	port_bg=chrome.runtime.connect({name: "BG#"+modName});
+	port_bg.onMessage.addListener(function(msg) {
+		bg.debug("pop_"+modName+"收到"+port_bg.name+"通道消息："+JSON.stringify(msg));	
+		if (msg.cmd == "bg.loadTrn.rs"){
+			if(msg.stat=="success"){
+				doLoadTrn(msg.data);				
+			}
+		}	
+	});	
+	
 	chrome.tabs.getSelected(function(tab){
 		port = chrome.tabs.connect(tab.id,{name: "mod_train"});
-		
 		port.onMessage.addListener(function(msg) {
-			bg.debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+			bg.debug("pop_"+modName+"收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "load.rs"){
 				doLoad(msg.data);
 			}
+			if (msg.cmd == "trn.rs"){
+				port_bg.postMessage({"cmd":"bg.loadTrn","un":userName});
+			}
 		});
-		
+		// 载入训练信息
 		loadTrn();
 	});
 }
@@ -32,7 +47,6 @@ function loadPort(){
 */
 
 function loadTrn(){
-
 	var lowKey="lvLow";
 	var upKey="lvUp";	
 	
@@ -54,6 +68,7 @@ function loadTrn(){
 	
 	var msg={"cmd":"load","data":{"lvLow":lvLow,"lvUp":lvUp}};
 	port.postMessage(msg);
+	port_bg.postMessage({"cmd":"bg.loadTrn","un":userName});
 }
 function trn(){
 	var ap=document.getElementById("apNum").innerText;
@@ -88,7 +103,6 @@ function trn(){
 			}
 		}
 	}	
-	
 
 	var r=confirm("使用 '"+gName+"'卡组 攻击 '"+mName+"'"+"\n\n 是否开始自动训练？");
 	if (r==true){
@@ -121,10 +135,10 @@ function doLoad(rec){
 	for(var i=0;i<fList.length;i++){
 		jsAddItemToSelect(fL,fList[i].value,fList[i].key);
 	}
-	
+}
+function doLoadTrn(trnRS){
 	//载入战斗结果
 	var rs=document.getElementById("rs");
-	var trnRS=rec["trnRS"];
 	var tmpStr="";
 	if(trnRS.length!=0){
 		tmpStr+="<tr><td class='name c5'><b>战果</b></td><td class='name c5'><b>金币</b></td><td class='name c5'><b>经验值</b></td><td class='name c5'><b>技能提升</b></td></tr>";					
