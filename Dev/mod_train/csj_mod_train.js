@@ -1,5 +1,4 @@
-﻿log("c-training.js is loading");
-
+﻿log("load csj_mod_train.js");
 /** 变量定义区 */
 var nowAP=0;
 
@@ -16,7 +15,7 @@ var isRuning=false;
 {"mob":mobname,"lv":""}
 */
 
-function getMobList(){
+function getMobList(lvLow,lvUp){
 	var list=[];
 	var mmList=document.querySelectorAll("#mobunit>.name.floatinline");
 	for(var i=0;i<mmList.length;i++){
@@ -29,17 +28,16 @@ function getMobList(){
 		var mms=mmDiv.querySelector("div.small");
 		var mmlv=parseInt(mms.children[0].innerText);
 		
-		// log(mmId+"|"+mmName+"|"+mmlv);
-		
-		var lowLv=USER_LV-Lvlow;
-		var upLv=USER_LV+Lvup;		
+		// debug(mmId+"|"+mmName+"|"+mmlv);
+		var lowLv=USER_LV-lvLow;
+		var upLv=USER_LV+lvUp;		
 		if(lowLv<=mmlv&&mmlv<=upLv){
 			var value="Lv."+mmlv+" "+mmName;
 			// log(value);
 			list.push({"value":value,"key":mmId});
 		}
 	}
-	log("怪物列表："+lowLv+"-"+upLv);
+	debug("怪物列表："+lowLv+"-"+upLv);
 	debug(list);
 	return list;
 }
@@ -62,7 +60,7 @@ function getAP(){
 	return ap;
 }
 /*******************************自动训练区**************************************/
-function doTraining(gId,mId,callback) {
+function doTrain(gId,mId,callback) {
 	debug("gId:"+gId+".mId:"+mId);
 	isRuning=true;
 	var xhr = new XMLHttpRequest();
@@ -105,9 +103,10 @@ tinytext: null
 var R={"rs":"","jq":"","jy":"","jn":"","note":""};
 */
 
-function AfterTraining(gId,mId,res){
+function AfterTrain(gId,mId,res){
+	var port_bg=getBgPort(TRN_N);
 	if(res.success){
-		debug(res);
+		// debug(res);
 		var isContinue=true;
 		var stopMsg="百目说："
 		//更新当前AP值
@@ -190,7 +189,7 @@ function AfterTraining(gId,mId,res){
 		}		
 		// log(R);
 		//存储采集结果
-		DB_TRN.transaction([DB_OS_TRNRS], "readwrite").objectStore(DB_OS_TRNRS).add(R);
+		port_bg.postMessage({"cmd":"bg.saveTrn","un":USER_NAME,"data":R});
 		//判断是否继续运行		
 		// 5.1、执行次数到达
 		tmpRunCnt++;
@@ -206,23 +205,23 @@ function AfterTraining(gId,mId,res){
 		
 		// 继续调用
 		if(isContinue){
-			doTraining(gId,mId,AfterTraining);
+			doTrain(gId,mId,AfterTrain);
 		}else{
 			isRuning=false;
 			alert(stopMsg+"\n自动训练已经终止，请查收结果!");
+			if(TRN_N_portStat){
+				TRN_N_port.postMessage({"cmd":"trn.rs"});
+			}
 		}
 	}else{
 		// 存储训练结果
 		var rl=[{"rs":"","jq":"","jy":"","jn":"","note":"异常："+res.msg}];
-		var reqAdd2 = DB_TRN.transaction([DB_OS_TRNRS], "readwrite").objectStore(DB_OS_TRNRS).add(rl);
-		reqAdd2.onsuccess=function(evt){
-			debug(evt);
-		}	
+		port_bg.postMessage({"cmd":"bg.saveTrn","un":USER_NAME,"data":rl});
 		alert('百目说："是时候找寻求援助了！"');
 		log(res);
 	}
 }
-
+// 解析战斗结果
 function zdJX(txt){
 	var objE = document.createElement("div");
 　　objE.innerHTML = txt;
@@ -255,88 +254,79 @@ function zdJX(txt){
 	debug(rsList);
 	return rsList;
 }
-// var tmpT="百目悟空 获得了 39 金币 <br /> 百目悟空 的经验值增加了 1 点 <span class='lesser'>(100 / 100)</span>  <b class='lesser'>(经验值已满)</b> <br /> 百目悟空 的技能 <span class=upper>[斧]</span> 提升了 3 点 <span class=lesser> (174 / 180) </span><br />";
+/** var tmpT="百目悟空 获得了 39 金币 <br /> 百目悟空 的经验值增加了 1 点 
+<span class='lesser'>(100 / 100)</span>  <b class='lesser'>(经验值已满)</b> 
+<br /> 百目悟空 的技能 <span class=upper>[斧]</span> 提升了 3 点 <span class=lesser> (174 / 180) </span><br />";
 // log(zdJX(tmpT));
+**/
 /*******************************消息通信区**************************************/
 // {"mobList":[],"ap":"","gSelHTML":"","trnRS":[]}
 function loadTrn(data,port){
-	//设置怪物获取等级范围
-	Lvlow=data.lvLow;
-	Lvup=data.lvUp;
-	
 	var R={};
-	//读取目标怪物项
-	R["mobList"]=getMobList();
+	//读取目标怪物项,设置怪物获取等级范围
+	R["mobList"]=getMobList(data.lvLow,data.lvUp);
 	//读取可行动点
 	R["ap"]=getAP();
 	//读取可选卡组html
 	R["gSelHTML"]=getCardList();
-	//读取战斗结果
-	var trnrsList=[];
-	var objectStore = DB_TRN.transaction([DB_OS_TRNRS], "readonly").objectStore(DB_OS_TRNRS);
-	objectStore.openCursor().onsuccess = function(event) {
-		var cursor = event.target.result;
-		if (cursor) {
-			trnrsList.push(cursor.value);
-			cursor.continue();
-		}else {
-			if(trnrsList!=null&&trnrsList.length!=0){
-				R["trnRS"]=trnrsList;
-			}else{
-				var nullR={"rs":"","jq":"","jy":"","jn":"","note":"无上次训练的数据"};
-				R["trnRS"]=[nullR];		
-			}
-			debug("读取训练信息成功！");
-			debug(R);
-			port.postMessage({"cmd":"load.rs","data":R});
-		}
-	};	
+	port.postMessage({"cmd":"load.rs","data":R});
 }
 // {"gId":gid,"mId":mid,"trnNum":trnNum}
+// 卡组Id
+var gId;
+// 怪物Id
+var mId;
 function beginTrn(data){
 	if(data.trnNum!=0){
 		if(!isRuning){
 			RunCnt=data.trnNum;	
 			FailCnt=data.failNum;
+			gId=data.gId;
+			mId=data.mId;
 			tmpRunCnt=0;	
 			tmpFailCnt=0;
-			var reqClear = DB_TRN.transaction([DB_OS_TRNRS], "readwrite").objectStore(DB_OS_TRNRS).clear();
-			reqClear.onsuccess=function(evt){
-				doTraining(data.gId,data.mId,AfterTraining);
-			}			
+			var port_bg=getBgPort(TRN_N);
+			port_bg.postMessage({"cmd":"bg.clsTrn","un":USER_NAME});	
 		}else{
 			alert('百目说："本大人正在奋战，不要添乱！"');
 		}
 	}
 }
-// doTraining(54915,9010,AfterTraining);
+// doTrain(54915,9010,AfterTrain);
 
-/************************ 数据预备区 **********************/
-var DB_OS_TRNRS;
-var DB_TRN;
-function success_DB_TRN(db){
-	DB_OS_TRNRS = DC[TRN_N][0];
-	DB_TRN = db;
-}
 /********************** 通道消息 处理区**********************/
 function handlePort_modTrn(port){	
 	if(port.name == TRN_N){
-		port.onMessage.addListener(function(msg) {
-			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+		TRN_N_port=port;
+		TRN_N_port.onMessage.addListener(function(msg) {
+			debug("收到"+TRN_N_port.name+"通道消息："+JSON.stringify(msg));
+			TRN_N_portStat=true;
 			if (msg.cmd == "load"){
-				loadTrn(msg.data,port);
+				loadTrn(msg.data,TRN_N_port);
 			}else if (msg.cmd == "trn"){
 				beginTrn(msg.data);
 			}
 		});
+		TRN_N_port.onDisconnect.addListener(function(msg) {
+			TRN_N_portStat=false;
+		});
+	}
+}
+function listener_modTrn(msg){
+	if (msg.cmd == "bg.clsTrn.rs"){	
+		if(msg.stat=="success"){
+			doTrain(gId,mId,AfterTrain);
+		}else{
+			debug(msg.data);
+			alert("清空数据出错："+msg.data);
+		}
 	}
 }
 /********************** 自动执行区**********************/
 var TRN_N="mod_train";
-function csjLoad_mod_trn(){
-	chrome.runtime.onConnect.addListener(handlePort_modTrn);
-	Tool_connUserDB(success_DB_TRN);
-}
-csjLoad_mod_trn();
+var TRN_N_port;
+var TRN_N_portStat;
+chrome.runtime.onConnect.addListener(handlePort_modTrn);
+getBgPort(TRN_N).onMessage.addListener(listener_modTrn);
 
-log("c-training.js is done");
+log("load csj_mod_train.js done");

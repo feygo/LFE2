@@ -86,7 +86,7 @@ console.log("load bg_conf.js");
 		"mod":"自动采集",
 		"modconf":{},
 		"dept":[],
-		"bg":[],
+		"bg":["../mod_gather/bg_mod_gather.js"],
 		"urlist":[
 				{	"url":"#/city/gathering",
 					"js":["/mod_gather/csj_mod_gather.js"],
@@ -101,7 +101,7 @@ console.log("load bg_conf.js");
 					"lvUp":3
 				},
 		"dept":[],
-		"bg":[],
+		"bg":["../mod_train/bg_mod_train.js"],
 		"urlist":[
 				{	"url":"#/city/training",
 					"js":["/mod_train/csj_mod_train.js"],

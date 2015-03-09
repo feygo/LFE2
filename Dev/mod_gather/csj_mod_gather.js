@@ -99,6 +99,7 @@ function doGA(type,callback) {
 /**var R={"rs":"","wp":"","zd":"","jn":"","note":""};
 */
 function AfterGA(type,res){
+	var port_bg=getBgPort(GA_N);
 	if(res.success){
 		// log(res);
 		var isContinue=true;
@@ -174,11 +175,11 @@ function AfterGA(type,res){
 		}
 		// log(R);
 		//存储采集结果
-		DB_GA.transaction([DB_OS_GARS], "readwrite").objectStore(DB_OS_GARS).add(R);
+		port_bg.postMessage({"cmd":"bg.saveGA","un":USER_NAME,"data":R});
 		//判断是否继续运行		
 		// 5.1、执行次数到达
 		tmpRunCnt++;
-		if(isContinue==true&&RunCnt!=-1&&tmpRunCnt>=RunCnt){
+		if((isContinue==true)&&(RunCnt!=-1)&&(tmpRunCnt>=RunCnt)){
 			stopMsg+='"指定次数采集完成！@_@"\n';
 			isContinue=false;
 		}
@@ -187,21 +188,20 @@ function AfterGA(type,res){
 			stopMsg+='"没有AP啦～讨厌！T_T"\n';
 			isContinue=false;
 		}
-		
 		// 继续调用
 		if(isContinue){
 			doGA(type,AfterGA);
 		}else{
 			isRuning=false;
 			alert(stopMsg+"\n自动采集已经终止，请查收结果!");
+			if(GA_N_portStat){
+				GA_N_port.postMessage({"cmd":"ga.rs"});
+			}
 		}
 	}else{
 		// 存储采集结果
 		var rl={"rs":"","wp":"","zd":"","jn":"","note":"异常："+res.msg};		
-		var reqAdd2 = DB_GA.transaction([DB_OS_GARS], "readwrite").objectStore(DB_OS_GARS).add(rl);
-		reqAdd2.onsuccess=function(evt){
-			debug(evt);
-		}		
+		port_bg.postMessage({"cmd":"bg.saveGA","un":USER_NAME,"data":rl});
 		alert('百目说："出现了某种神秘异常！"');
 		error(res);
 	}
@@ -246,15 +246,15 @@ function yj(txt){
 	return rsList;
 }
 
-
+// 运行次数
 var RunCnt=0;
 var tmpRunCnt=0;
-
+// 失败次数
 var FailCnt=1;
 var tmpFailCnt=0;
-
+// 运行状态标识
 var isRuning=false;
-
+// 当前AP值
 var nowAP=0;
 // doGA("6",AfterGA);
 /** 消息通讯区*/
@@ -265,72 +265,61 @@ function loadGA(port){
 	R["gaList"]=getGAList();
 	//读取可行动点
 	R["ap"]=getAP();
-	//读取战斗结果	
-	var garsList=[];
-	var objectStore = DB_GA.transaction([DB_OS_GARS], "readonly").objectStore(DB_OS_GARS);
-	objectStore.openCursor().onsuccess = function(event) {
-		var cursor = event.target.result;
-		if (cursor) {
-			// debug(cursor);
-			garsList.push(cursor.value);
-			cursor.continue();
-		}else {
-			if(garsList!=null&&garsList.length!=0){
-				R["gaRS"]=garsList;
-			}else{
-				var nullR={"rs":"","wp":"","zd":"","jn":"","note":"无上次采集的数据"}
-				R["gaRS"]=[nullR];		
-			}
-			debug("读取采集信息成功！");
-			debug(R);
-			port.postMessage({"cmd":"load.rs","data":R});
-		}
-	};	
+	port.postMessage({"cmd":"load.rs","data":R});
 }
+// 采集类型
+var gaType;
 function beginGA(data){
 	if(data.gaNum!=0){
 		if(!isRuning){
 			RunCnt=data.gaNum;
 			FailCnt=data.failNum;
+			gaType=data.gaType;
 			tmpRunCnt=0;
 			tmpFailCnt=0;
-			var reqClear = DB_GA.transaction([DB_OS_GARS], "readwrite").objectStore(DB_OS_GARS).clear();
-			reqClear.onsuccess=function(evt){
-				doGA(data.gaType,AfterGA);
-			}			
+			var port_bg=getBgPort(GA_N);
+			port_bg.postMessage({"cmd":"bg.clsGA","un":USER_NAME});
 		}else{
 			alert("自动采集正在执行中，请稍后再试！");
 		}
 	}
 }
 
-/************************ 数据预备区 **********************/
-var DB_OS_GARS;
-var DB_GA;
-function success_DB_GA(db){
-	DB_OS_GARS = DC[GA_N][0];
-	DB_GA = db;
-}
 /********************** 通道消息 处理区**********************/
 function handlePort_modGA(port){	
 	if(port.name == GA_N){
-		port.onMessage.addListener(function(msg) {
-			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+		GA_N_port=port;
+		GA_N_port.onMessage.addListener(function(msg) {
+			debug("收到"+GA_N_port.name+"通道消息："+JSON.stringify(msg));
+			GA_N_portStat=true;
 			if (msg.cmd == "load"){
-				loadGA(port);
-			}else if (msg.cmd == "ga"){
+				loadGA(GA_N_port);
+			}
+			if (msg.cmd == "ga"){
 				beginGA(msg.data);
 			}
+		});
+		GA_N_port.onDisconnect.addListener(function(msg) {
+			GA_N_portStat=false;
 		});
 	}
 }
 
+function listener_modGA(msg){
+	if (msg.cmd == "bg.clsGA.rs"){	
+		if(msg.stat=="success"){
+			doGA(gaType,AfterGA);
+		}else{
+			debug(msg.data);
+			alert("清空数据出错："+msg.data);
+		}
+	}
+}
 /********************** 自动执行区**********************/
 var GA_N="mod_gather";
-function csjLoad_mod_ga(){
-	chrome.runtime.onConnect.addListener(handlePort_modGA);
-	Tool_connUserDB(success_DB_GA);
-}
-csjLoad_mod_ga();
+var GA_N_port;
+var GA_N_portStat;
+chrome.runtime.onConnect.addListener(handlePort_modGA);	
+getBgPort(GA_N).onMessage.addListener(listener_modGA);
 
 log("load csj_mod_gather.js done");

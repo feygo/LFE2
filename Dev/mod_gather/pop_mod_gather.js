@@ -1,19 +1,35 @@
 ﻿/** 后台通讯区 */
+var modName="mod_gather";
 var bg = chrome.extension.getBackgroundPage();   
 bg.log("popup load pop_mod_gather.js");
 /*********************** 页面通道 通讯区 *********************/
+var userName=bg.Tool_getUserName(location.search);
 var port;
+var port_bg;
 function loadPort(){
+	port_bg=chrome.runtime.connect({name: "BG#"+modName});
+	port_bg.onMessage.addListener(function(msg) {
+		bg.debug("pop_"+modName+"收到"+port_bg.name+"通道消息："+JSON.stringify(msg));	
+		if (msg.cmd == "bg.loadGA.rs"){
+			if(msg.stat=="success"){
+				doLoadGA(msg.data);				
+			}
+		}	
+	});	
+
 	chrome.tabs.getSelected(function(tab){
-		port = chrome.tabs.connect(tab.id,{name: "mod_gather"});
-		loadGA();
-		
+		port = chrome.tabs.connect(tab.id,{name: modName});
 		port.onMessage.addListener(function(msg) {
-			bg.debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
+			bg.debug("pop_"+modName+"收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "load.rs"){
 				doLoad(msg.data);
 			}
-		});
+			if (msg.cmd == "ga.rs"){
+				port_bg.postMessage({"cmd":"bg.loadGA","un":userName});
+			}
+		});	
+		// 载入采集信息
+		loadGA();
 	});
 }
 
@@ -29,10 +45,12 @@ function loadPort(){
 						{"id":id,"name":name}			
 
 */
-
+// 载入采集信息和上次数据
 function loadGA(){
 	port.postMessage({"cmd":"load"});
+	port_bg.postMessage({"cmd":"bg.loadGA","un":userName});
 }
+// 执行采集动作
 function ga(){
 	var ap=document.getElementById("apNum").innerText;
 	if(10>parseInt(ap)){
@@ -72,7 +90,7 @@ function ga(){
 		port.postMessage(msg);	
 	}
 }
-
+// 展示采集信息
 function doLoad(rec){	
 	//载入可采集项目
 	var dl=document.getElementById("ga_list");
@@ -95,10 +113,11 @@ function doLoad(rec){
 	for(var i=0;i<fList.length;i++){
 		jsAddItemToSelect(fL,fList[i].value,fList[i].key);
 	}
-	
+}
+// 展示战斗结果
+function doLoadGA(gaRS){
 	//载入战斗结果
 	var rs=document.getElementById("rs");
-	var gaRS=rec["gaRS"];
 	var tmpStr="";
 	if(gaRS.length!=0){
 		tmpStr+="<tr><td class='name c5'><b>结果</b></td><td class='name c5'><b>获得物品</b></td><td class='name c5'><b>遭遇战斗</b></td><td class='name c5'><b>技能提升</b></td></tr>";					
