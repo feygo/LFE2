@@ -27,9 +27,6 @@ function loadRecord(userName,id,port){
 }
 
 /********************** 通道消息 处理区**********************/
-/**
-"cmd":"loadDeck","data":slt.value
-**/
 function handlePort_modNote(port){	
 	if(port.name == "BG#"+MN_Note){
 		port.onMessage.addListener(function(msg) {

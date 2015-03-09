@@ -453,76 +453,6 @@ function doSortDeckEx(data){
 
 /***********************************多卡排序  功能区  结束******************************************/
 
-/************************ 数据预备区 **********************/
-var DB_OS_Sort;
-// {"key":DB_OS_SortConf,"value":}
-const Key_SortVer="SortVer";
-const Key_LocalCard="LocalCard";
-var DB_OS_SortConf;
-
-var DB_SortDeck;
-// 数据库连接之后 自动执行的函数
-function success_DB_SortDeck(db){
-	// 变量赋值
-	DB_OS_Sort = DC[SDECK_N][0];
-	DB_OS_SortConf = DC[SDECK_N][1];
-	// 检查引擎版本
-	DB_SortDeck=db;
-	var trans=DB_SortDeck.transaction([DB_OS_SortConf,DB_OS_Sort], "readwrite");
-	var OS_SortConf=trans.objectStore(DB_OS_SortConf);
-    var request = OS_SortConf.get(Key_SortVer);
-	request.onsuccess = function(evt) {
-		// 检查排序引擎版本
-		var sortVer = request.result;
-		if(sortVer==undefined||sortVer==null||sortVer["value"]!=sortRuleVer){
-			//如果版本不存在，如果版本有更新，则更新版本
-			var verUpdate = OS_SortConf.put({"key":Key_SortVer,"value":sortRuleVer});
-			OS_SortConf.put({"key":Key_LocalCard,"value":null});
-			verUpdate.onsuccess = function(evt) {
-				var msg="排序引擎版本更新:"+sortRuleVer;
-				debug(msg);
-				//清空排序引擎数据
-				var OS_Sort=trans.objectStore(DB_OS_Sort);				
-				var requestClear = OS_Sort.clear();
-				requestClear.onerror = function(evt) {
-					debug("引擎数据清空出错:"+evt.target.error.message);
-				};	
-				requestClear.onsuccess = function(evt) {
-					var msg="引擎数据清空成功";
-					debug(msg);
-					initSorter();
-					// 载入排序引擎数据
-					loadSorter();
-				}
-			}
-			verUpdate.onerror =function(evt){
-				var msg="排序引擎版本更新出错:"+evt.target.error.message;
-				debug(msg);
-			}
-		}else{
-			// 如果存在版本，则载入引擎数据
-			loadSorter();
-		}		
-	}
-	request.onerror =function(evt){
-		var msg="排序引擎版本读取出错:"+evt.target.error.message;
-		debug(msg);
-	}
-}
-// 将sortConfig中的配置项，写入到db中
-function initSorter(){
-	// 初始化引擎数据
-	var OS_Sort=DB_SortDeck.transaction([DB_OS_Sort], "readwrite").objectStore(DB_OS_Sort);	
-	for(var i=0;i<sortConfig.length;i++){	
-		var reqInit=OS_Sort.add({"id":sortConfig[i].id,"data":[]});
-		reqInit.onsuccess = function(evt) {
-			debug("引擎数据初始化:"+evt.target.result);
-		}
-		reqInit.onerror = function(evt) {
-			debug("引擎数据初始化出错:"+evt.target.error.message);
-		};	
-	}	
-}
 // 装载排序对象的容器，给SortList赋值，然后调用页面排序检测的动作
 function loadSorter(){
 	// 载入规则引擎
@@ -540,13 +470,19 @@ function loadSorter(){
 		tmp.data=[];
 		tmpMap[s.id]=tmp;
 	}
+	var port_bg=getBgPort(SDECK_N);
+	debug(port_bg);
 	for(var id in tmpMap){
-		var OS_Sort=DB_SortDeck.transaction([DB_OS_Sort], "readwrite").objectStore(DB_OS_Sort);	
-		var reqData = OS_Sort.get(id);
-		reqData.onerror = function(evt) {
-			debug("引擎数据读取出错:"+evt.target.error.message);
-		};	
-		reqData.onsuccess = function(evt) {
+		port_bg.postMessage({"cmd":"bg.getSortData","un":USER_NAME,"id":id});
+		port_bg.onMessage.addListener(function(msg) {
+			if (msg.cmd == "bg.getSortData.rs"){
+				debug(msg.data);
+				if(msg.stat=="success"){
+					
+				}
+			}			
+		});
+		
 			// 写入sortList作为排序对象的容器
 			var tmpS=tmpMap[evt.target.result.id];
 			tmpS.data=evt.target.result.data;
@@ -629,7 +565,8 @@ function updateCardList(){
 **/
 function handlePort_modSortDeck(port){	
 	if(port.name == SDECK_N){
-		port.onMessage.addListener(function(msg) {
+		SDECK_N_port=port;
+		SDECK_N_port.onMessage.addListener(function(msg) {
 			debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "sortDeck"){
 				sortDeck(msg.id);
@@ -639,9 +576,21 @@ function handlePort_modSortDeck(port){
 }
 /********************** 自动执行区**********************/
 var SDECK_N="mod_sortDeck";
+var SDECK_N_port;
 function csjLoad_mod_sortDeck(){
 	chrome.runtime.onConnect.addListener(handlePort_modSortDeck);
-	Tool_connUserDB(success_DB_SortDeck);
+	//	检查引擎版本
+	var port_bg=getBgPort(SDECK_N);
+	port_bg.postMessage({"cmd":"bg.checkSortVer","un":USER_NAME,"data":sortRuleVer});
+	port_bg.onMessage.addListener(function(msg) {
+		if (msg.cmd == "bg.checkSortVer.rs"){
+			debug(msg.data);
+			if(msg.stat=="success"){
+				// 检查引擎通过后，开始载入引擎
+				loadSorter();
+			}
+		}			
+	});
 }
 csjLoad_mod_sortDeck();
 log("load csj_mod_sortDeck.js done");
