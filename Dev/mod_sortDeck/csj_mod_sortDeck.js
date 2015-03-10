@@ -55,8 +55,8 @@ function getStr(e){
 
 // 轮询各种排序机制
 function controller(idDiv,infoL){	
-	for(var i=0;i<sortList.length;i++){
-		var s=sortList[i];
+	for(var id in sortCache){
+		var s=sortCache[id];
 		var c=0;
 		if(s.check==null){
 			c=s.checkCommon(infoL)
@@ -77,8 +77,8 @@ var sortRuleVer=1;
 
 // {"id":"sortByDelayAtt","check":sortByDelayAttCheck},
 // {"id":"sortByDelayTalAtt","check":sortByDelayTalAttCheck},
-
-var sortList=[];
+// 排序数据缓存
+var sortCache={};
 var sortConfig=[	
 	/*************直接攻击 排序算法区**************/
 	//### 直接攻击  物理  排序 :最大值排序
@@ -376,26 +376,14 @@ function sortByDelayAttCheck(cInfo){
 // 卡组桌面排序
 function sortDeck(sId){
 	debug("排序命令："+sId);
-	var objectStore=DB_SortDeck.transaction([DB_OS_Sort], "readwrite").objectStore(DB_OS_Sort);
-    var request = objectStore.get(sId);
-	request.onsuccess = function(evt) {
-		var rs = request.result
-		var data=rs.data;
-		if(data==null||data.length==0){
-			debug("待排序元素为0");
-			alert("未发现符合排序要求的卡片！");
-			return;
-		}
-		debug("排序元素："+data.length);
-		rs.data=doSortDeckEx(data);		
-		var requestUpdate = objectStore.put(rs);
-		requestUpdate.onerror = function(event) {
-			debug("排序引擎数据出错:"+evt.target.error.message);
-		};	
-		requestUpdate.onsuccess = function(evt) {
-			debug("排序引擎数据更新:"+rs.id);
-		}
-	}	
+	var data=sortCache[sId].data;
+	if(data==null||data.length==0){
+		debug("待排序元素为0");
+		alert("未发现符合排序要求的卡片！");
+		return;
+	}
+	debug("排序元素："+data.length);
+	doSortDeckEx(data);		
 }
 // 按照卡组内容排序 {"cid":idDiv,"info":info} COPY_deck_card514_div card514_div
 // 用来代替原有方法
@@ -444,23 +432,14 @@ function doSortDeckEx(data){
 	debug("排序后元素数："+newAc.children.length);
 	document.querySelector("#active_cards").innerHTML=newAc.innerHTML;
 	debug("排序后总元素："+ac.querySelectorAll("div.cardlist.realcard").length);
-	var r=[];
-	for(var cid in tmpMap){
-		r.push({"cid":cid,"info":tmpMap[cid]});
-	}
-	return r;
 }
 
 /***********************************多卡排序  功能区  结束******************************************/
-
 // 装载排序对象的容器，给SortList赋值，然后调用页面排序检测的动作
 function loadSorter(){
-	var port_bg=getBgPort(SDECK_N);
 	// 载入规则引擎
-	var scLen=sortConfig.length;
-	var tmpNum=0;
 	debug("排序容器加载开始...");
-	var tmpMap={};
+	sortCache={};
 	for(var i=0;i<sortConfig.length;i++){
 		var s=sortConfig[i];		
 		var tmp=new sorter(s.id);
@@ -468,91 +447,78 @@ function loadSorter(){
 		if(s["regStrList"]!=null){tmp.regStrList=s.regStrList;}
 		if(s["getValue"]!=null){tmp.getValue=s.getValue;}				
 		tmp.regLog();	
-		tmp.data=[];
-		tmpMap[s.id]=tmp;
-		// 获取引擎数据
-		port_bg.postMessage({"cmd":"bg.getSortData","un":USER_NAME,"id":s.id});
+		sortCache[s.id]=tmp;	
 	}
-
-	for(var id in tmpMap){
-		
-
-		
-			// 写入sortList作为排序对象的容器
-			var tmpS=tmpMap[evt.target.result.id];
-			tmpS.data=evt.target.result.data;
-			sortList.push(tmpS);
-			debug("引擎数据读取成功:"+evt.target.result.id);
-			
-			// 如果对象容器加载完成
-			tmpNum++;
-			// debug(scLen+"|"+tmpNum);
-			if(scLen==tmpNum){
-				debug(sortList);
-				debug("排序容器加载结束...");
-				// 获取页面的新卡片
-				updateCardList();		
-			}
-		}
-	}	
+	debug("排序容器加载结束...");
+	debug(sortCache);
 }
+// 载入排队引起的数据
+function loadSorterData(){
+	var port_bg=getBgPort(SDECK_N);
+	sDataCnt=0;
+	debug("引擎数据读取开始...");
+	for(var id in sortCache){
+		port_bg.postMessage({"cmd":"bg.getSortData","un":USER_NAME,"id":id});
+	}
+}
+// 用于记录发送数据请求的数量
+var sDataCnt;
+function handlePort_loadSorterData(msg){	
+	sortCache[msg.id].data=msg.data;
+	sDataCnt++;
+	if(Tool_getObjLength(sortCache)==sDataCnt){
+		debug("引擎数据读取完成...");
+		debug(sortCache);
+		// 获取本地卡片数据，检测卡片更新
+		var port_bg=getBgPort(SDECK_N);
+		port_bg.postMessage({"cmd":"bg.getLocalCard","un":USER_NAME});
+	}
+}
+
 // 根据排序对象的容器中，检测页面中是否有新增的卡片信息
-function updateCardList(){
+function updateCardList(localCard){	
+	
 	//获取所有卡牌列表
 	var nowCardList=document.querySelectorAll("div.cardlist.realcard");
 	// log(nowCardList[0]);
 	debug("页面卡片数量:"+nowCardList.length);
-
-	var tx=DB_SortDeck.transaction([DB_OS_SortConf,DB_OS_Sort], "readwrite");
-	var OS_SortConf=tx.objectStore(DB_OS_SortConf)
-	var reqLC=OS_SortConf.get(Key_LocalCard);
-	reqLC.onsuccess = function(evt) {
-		// 获取本地存储的cardList
-		var rs=evt.target.result;
-		var localCard=rs.value;		
-		if(localCard==null){
-			localCard={};			
-		}
-		debug("存储中卡片数量:"+Tool_getObjLength(localCard));
+	debug("存储中卡片数量:"+Tool_getObjLength(localCard));
 		
-		var newLcl={};
-		var nCnt=0;
-		//循环检查新卡牌
-		for(var i=0;i<nowCardList.length;i++){
-			var tmp=nowCardList[i].id;
-			if(localCard[tmp]==null){
-				// log(tmp);			
-				nCnt++;
-				//解析新卡牌的情况
-				var infoL=fxCard(tmp);
-				// log(infoL);
-				//将卡片送入排序池
-				controller(tmp,infoL);
-			}
-			// 更新本地卡组列表
-			newLcl[tmp]=i;
-			// 删除本地卡牌信息
-			delete localCard[tmp];
+	var newLcl={};
+	var nCnt=0;
+	//循环检查新卡牌
+	for(var i=0;i<nowCardList.length;i++){
+		var tmp=nowCardList[i].id;
+		if(localCard[tmp]==null){
+			// log(tmp);			
+			nCnt++;
+			//解析新卡牌的情况
+			var infoL=fxCard(tmp);
+			// log(infoL);
+			//将卡片送入排序池
+			controller(tmp,infoL);
 		}
-		debug("发现有差异的卡片数量:"+Tool_getObjLength(localCard));
-		debug("发现未排序的卡片数量："+nCnt);
-		// 存储sortList中的数据
-		if(nCnt>0){
-			debug("引擎数据更新...");
-			debug(sortList);
-			var OS_Sort=DB_SortDeck.transaction([DB_OS_Sort], "readwrite").objectStore(DB_OS_Sort);	
-			for(var j=0;j<sortList.length;j++){				
-				OS_Sort.put({"id":sortList[j].id,"data":sortList[j].data});
-				debug("引擎数据更新:"+sortList[j].id);
-			}
-		}		
-		// 存储本地卡组列表
-		rs.value=newLcl;
-		var reqLocalCard=OS_SortConf.put(rs);
-		reqLocalCard.onsuccess = function(evt) {
-			debug("存储中卡片数量更新:"+Tool_getObjLength(newLcl));
-		}
+		// 更新本地卡组列表
+		newLcl[tmp]=i;
+		// 删除本地卡牌信息
+		delete localCard[tmp];
 	}
+	debug("发现有差异的卡片数量:"+Tool_getObjLength(localCard));
+	debug("发现未排序的卡片数量："+nCnt);
+	var port_bg=getBgPort(SDECK_N);
+	// 存储sortList中的数据
+	if(nCnt>0){
+		debug("引擎数据更新...");
+		debug(sortCache);	
+		for(var id in sortCache){
+			var data={"id":id,"data":sortCache[id].data};
+			port_bg.postMessage({"cmd":"bg.setSortData","un":USER_NAME,"data":data});
+			debug("引擎数据更新:"+id);
+		}
+	}		
+	// 存储本地卡组列表
+	port_bg.postMessage({"cmd":"bg.setLocalCard","un":USER_NAME,"data":newLcl});
+	debug("存储中卡片数量更新:"+Tool_getObjLength(newLcl));
 }
 /********************** 通道消息 处理区**********************/
 /**
@@ -569,6 +535,32 @@ function handlePort_modSortDeck(port){
 		});
 	}
 }
+// 用于处理bg的port
+function listener_modSortDeck(msg){
+	if (msg.cmd == "bg.checkSortVer.rs"){
+		if(msg.stat=="success"){
+			// 检查引擎通过后，开始载入引擎
+			loadSorter();
+			loadSorterData();
+		}
+	}
+	if (msg.cmd == "bg.getSortData.rs"){
+		if(msg.stat=="success"){
+			// 接收引擎数据
+			handlePort_loadSorterData(msg);
+		}else{
+			error(msg);
+		}
+	}
+	if (msg.cmd == "bg.getLocalCard.rs"){
+		if(msg.stat=="success"){
+			// 接收本地数据
+			updateCardList(msg.data);
+		}else{
+			error(msg);
+		}
+	}	
+}
 /********************** 自动执行区**********************/
 var SDECK_N="mod_sortDeck";
 var SDECK_N_port;
@@ -577,21 +569,7 @@ function csjLoad_mod_sortDeck(){
 	//	检查引擎版本
 	var port_bg=getBgPort(SDECK_N);
 	port_bg.postMessage({"cmd":"bg.checkSortVer","un":USER_NAME,"data":sortRuleVer});
-	port_bg.onMessage.addListener(function(msg) {
-		if (msg.cmd == "bg.checkSortVer.rs"){
-			debug(msg.data);
-			if(msg.stat=="success"){
-				// 检查引擎通过后，开始载入引擎
-				loadSorter();
-			}
-		}
-		if (msg.cmd == "bg.getSortData.rs"){
-			debug(msg.data);
-			if(msg.stat=="success"){
-				
-			}
-		}			
-	});
+	port_bg.onMessage.addListener(listener_modSortDeck);
 }
 csjLoad_mod_sortDeck();
 log("load csj_mod_sortDeck.js done");

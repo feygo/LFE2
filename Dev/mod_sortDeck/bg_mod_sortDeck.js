@@ -13,7 +13,7 @@ function checkSortVer(userName,sortRuleVer,port){
 			if(sortVer==undefined||sortVer==null||sortVer["value"]!=sortRuleVer){
 				//如果版本不存在，如果版本有更新，则更新版本
 				var verUpdate = OS_SortConf.put({"key":Key_SortVer,"value":sortRuleVer});
-				OS_SortConf.put({"key":Key_LocalCard,"value":null});
+				OS_SortConf.put({"key":Key_LocalCard,"value":{}});
 				verUpdate.onsuccess = function(evt) {
 					var msg="排序引擎版本更新:"+sortRuleVer;
 					debug(msg);
@@ -69,7 +69,7 @@ function initSorter(){
 function getSortData(userName,dataId,port){
 	Tool_getConn(userName,function(db){
 		var OS_Sort=db.transaction([DB_OS_Sort], "readonly").objectStore(DB_OS_Sort);	
-		var reqData = OS_Sort.get(id);
+		var reqData = OS_Sort.get(dataId);
 		reqData.onerror = function(evt) {
 			var msg="引擎数据读取出错:"+evt.target.error.message;
 			debug(msg);
@@ -78,9 +78,9 @@ function getSortData(userName,dataId,port){
 		reqData.onsuccess = function(evt) {
 			var sortData=evt.target.result;
 			if(sortData){
-				port.postMessage({"cmd":"bg.getSortData.rs","stat":"success","data":sortData.data});
+				port.postMessage({"cmd":"bg.getSortData.rs","stat":"success","id":dataId,"data":sortData.data});
 			}else{
-				port.postMessage({"cmd":"bg.getSortData.rs","stat":"success","data":[]});					
+				port.postMessage({"cmd":"bg.getSortData.rs","stat":"success","id":dataId,"data":[]});					
 			}
 		}
 	});
@@ -88,7 +88,7 @@ function getSortData(userName,dataId,port){
 // 写入引起数据
 function setSortData(userName,sortData){
 	Tool_getConn(userName,function(db){
-		var OS_Sort=db.transaction([DB_OS_Sort], "readonly").objectStore(DB_OS_Sort);	
+		var OS_Sort=db.transaction([DB_OS_Sort], "readwrite").objectStore(DB_OS_Sort);	
 		var reqData = OS_Sort.put(sortData);
 		reqData.onerror = function(evt) {
 			var msg="引擎数据保存出错:"+evt.target.error.message;
@@ -122,8 +122,9 @@ function getLocalCard(userName,port){
 // 写入本地卡片数据
 function setLocalCard(userName,lcData){
 	Tool_getConn(userName,function(db){
-		var OS_SortConf=db.transaction([DB_OS_SortConf], "readonly").objectStore(DB_OS_SortConf);	
-		var reqData = OS_SortConf.put(lcData);
+		var OS_SortConf=db.transaction([DB_OS_SortConf], "readwrite").objectStore(DB_OS_SortConf);
+		var data={"key":Key_LocalCard,"value":lcData};
+		var reqData = OS_SortConf.put(data);
 		reqData.onerror = function(evt) {
 			var msg="本地卡片数据保存出错:"+evt.target.error.message
 			debug(msg);

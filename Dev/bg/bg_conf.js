@@ -69,7 +69,7 @@ console.log("load bg_conf.js");
 		"mod":"卡组排序",
 		"modconf":{},
 		"dept":[],
-		"bg":[],
+		"bg":["../mod_sortDeck/bg_mod_sortDeck.js"],
 		"urlist":[
 				{	"url":"#/character/deck",
 					"js":["/mod_sortDeck/csj_mod_sortDeck.js"],
@@ -159,14 +159,14 @@ console.log("load bg_conf.js");
 		"mod":"未满5张卡片统计",
 		"modconf":{},
 		"dept":[],
-		"bg":[],
+		"bg":["../mod_lessFiveCard/bg_mod_lessFiveCard.js"],
 		"urlist":[
 				{	"url":"#/character/card",
-					"js":["/mod_lessFiveCard/csj_mod_lessFiveCard_cc.js","/mod_lessFiveCard/csj_mod_lessFiveCard_g.js"],
-					"pop":"15:不满5张:/mod_lessFiveCard/pop_mod_lessFiveCard.html"
+					"js":["/mod_lessFiveCard/csj_mod_lessFiveCard_cc.js"],
+					"pop":""
 				},
 				{	"url":"#/*",
-					"js":["/mod_lessFiveCard/csj_mod_lessFiveCard_g.js"],
+					"js":[],
 					"pop":"15:不满5张:/mod_lessFiveCard/pop_mod_lessFiveCard.html"
 				},
 				{	"url":"#/market/shop/id/*",
