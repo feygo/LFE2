@@ -30,6 +30,19 @@ function loadLFive(userName,port){
 		}		
 	});
 }
+// 清空
+function clsLFive(userName,port){
+	Tool_getConn(userName,function(db){
+		var request = db.transaction([DB_OS_LFC], "readwrite").objectStore(DB_OS_LFC).clear();
+		request.onsuccess = function(evt) {	
+			port.postMessage({"cmd":"bg.clsLFive.rs","stat":"success"});
+		};
+		request.onerror =function(evt){
+			error(evt);
+			port.postMessage({"cmd":"bg.clsLFive.rs","stat":"error","data":evt.target.error.message});
+		}		
+	});
+}
 /********************** 通道消息 处理区**********************/
 /**
 "cmd":"loadDeck","data":slt.value
@@ -40,6 +53,9 @@ function handlePort_modMultDeck(port){
 			debug("BG收到"+port.name+"通道消息："+JSON.stringify(msg));
 			if (msg.cmd == "bg.loadLFive"){
 				loadLFive(msg.un,port);			
+			}
+			if (msg.cmd == "bg.clsLFive"){
+				clsLFive(msg.un,port);			
 			}
 			if (msg.cmd == "bg.saveLFive"){
 				saveLFive(msg.un,msg.data,port);

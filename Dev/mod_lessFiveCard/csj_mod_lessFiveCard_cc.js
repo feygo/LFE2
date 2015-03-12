@@ -21,24 +21,25 @@ function loadLessFive(){
 	}
 }
 // 清除满足5张数量的卡片
-function checkLFive(){
+function clsLFive(){
 	var port_bg=getBgPort(LFIVE_N);
-	port_bg.postMessage({"cmd":"bg.loadLFive","un":USER_NAME});
-}
-function handlePort_checkLFive(msg){
-	// inner_card_num1199
-	// msg.data.num
-	// msg.data.cardId
+	port_bg.postMessage({"cmd":"bg.clsLFive","un":USER_NAME});
 }
 /************************ 数据预备区 **********************/
 // 用于处理bg的port
 function listener_modLFive(msg){
-	if (msg.cmd == "bg.loadLFive.rs"){	
-		handlePort_checkLFive(msg);
+	if (msg.cmd == "bg.clsLFive.rs"){
+		if(msg.stat=="success"){
+			loadLessFive();
+		}else{
+			debug("清空少于5张的卡片出错："+msg.data);
+		}
 	}
 }
 /********************** 自动执行区**********************/
 var LFIVE_N="mod_lessFiveCard";
 
 getBgPort(LFIVE_N).onMessage.addListener(listener_modLFive);
+clsLFive();
+
 log("load csj_mod_lessFiveCard_cc.js done");

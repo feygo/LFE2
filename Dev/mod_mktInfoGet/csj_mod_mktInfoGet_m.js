@@ -43,9 +43,6 @@ function getMktInfo(){
 
 
 /********************** 自动执行区**********************/
-function csjLoad_mod_mig_m(){
-	getMktInfo();
-}
-csjLoad_mod_mig_m();
+getMktInfo();
 
 log("load csj_mod_mktInfoGet_m.js done");

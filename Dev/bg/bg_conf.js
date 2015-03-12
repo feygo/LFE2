@@ -114,7 +114,7 @@ console.log("load bg_conf.js");
 		"mod":"城市信息获取",
 		"modconf":{},
 		"dept":[],
-		"bg":["/mod_cityInfoGet/bg_mod_cityInfoGet.js"],
+		"bg":["../mod_cityInfoGet/bg_mod_cityInfoGet.js"],
 		"urlist":[
 				{	"url":"#/city",
 					"js":["/mod_cityInfoGet/csj_mod_cityInfoGet.js"],
@@ -126,7 +126,7 @@ console.log("load bg_conf.js");
 		"mod":"商店信息获取",
 		"modconf":{},
 		"dept":[],
-		"bg":["/mod_mktInfoGet/bg_mod_mktInfoGet.js"],
+		"bg":["../mod_mktInfoGet/bg_mod_mktInfoGet.js"],
 		"urlist":[
 				{	"url":"#/market/shop/id/*",
 					"js":["/mod_mktInfoGet/csj_mod_mktInfoGet_s.js"],
@@ -185,10 +185,10 @@ console.log("load bg_conf.js");
 		"mod":"合成卡片收集度",
 		"modconf":{},
 		"dept":[],
-		"bg":[],
+		"bg":["../mod_craftProcess/bg_mod_craftProcess.js"],
 		"urlist":[
 				{	"url":"#/*",
-					"js":["/mod_craftProcess/csj_mod_craftProcess.js"],
+					"js":[],
 					"pop":"21:合成卡片:/mod_craftProcess/pop_mod_craftProcess.html"
 				},
 				{	"url":"#/market/shop/id/*",
@@ -210,10 +210,10 @@ console.log("load bg_conf.js");
 		"mod":"合成卡片监控",
 		"modconf":{},
 		"dept":[],
-		"bg":[],
+		"bg":["../mod_craftFocus/bg_mod_craftFocus.js"],
 		"urlist":[
 				{	"url":"#/*",
-					"js":["/mod_craftFocus/csj_mod_craftFocus.js"],
+					"js":[],
 					"pop":"22:监控卡片:/mod_craftFocus/pop_mod_craftFocus.html"
 				},
 				{	"url":"#/market/shop/id/*",

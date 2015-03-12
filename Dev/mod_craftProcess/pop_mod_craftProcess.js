@@ -1,46 +1,41 @@
 ﻿
 /** 后台通讯区 */
+var modName="mod_craftProcess";
 var bg = chrome.extension.getBackgroundPage();   
 bg.log("popup load pop_mod_craftProcess.js");
 /*********************** 页面通道 通讯区 *********************/
-var port;
-var tabId;
+var userName=bg.Tool_getUserName(location.search);
+var port_bg;
 function loadPort(){
-	chrome.tabs.getSelected(function(tab){
-		tabId=tab.id;
-		port = chrome.tabs.connect(tab.id,{name: "mod_craftProcess"});
-		showShopList();
-		
-		/**
-		页面操作指令 消息结构：{"cmd":"loadDeck","dId":slt.value}
-		页面操作反馈 消息结构：{"rs":list};
-		*/
-		/** 业务功能区 */
-		port.onMessage.addListener(function(msg) {
-			bg.debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
-			if (msg.cmd == "getCardNum.rs"){
-				var cardId=msg.id;
-				var num=msg.data;
-				var shopId=msg.shopId;
-				// 更新卡片商店详细列表缓存
-				shopCardRS[shopId][cardId]["num"]=num;
-				// 对应商店列表 进行计数，并且更新cp值
-				if(num!=-1&&num!=0){
-					cnt("uCnt");
-					cnt(shopId+"_uc");
-					cp(shopId);					
-				}
-			}
-		});
-		
-		// 判断是否启动卡片监控功能
-		if(bg.MOD_NOW["mod_craftFocus"]){
-			bg.debug("启动Mod功能:合成商店卡片监控");
-			isModCraftFocus=true;
-		}else{
-			isModCraftFocus=false;
+	port_bg=chrome.runtime.connect({name: "BG#"+modName});
+	port_bg.onMessage.addListener(function(msg) {
+		bg.debug("pop_"+modName+"收到"+port_bg.name+"通道消息："+JSON.stringify(msg));	
+	});
+	port_bg.onMessage.addListener(function(msg) {
+		if (msg.cmd == "bg.getCardNum.rs"){
+			var cardId=msg.id;
+			var num=msg.data;
+			var shopId=msg.shopId;
+			// 更新卡片商店详细列表缓存
+			shopCardRS[shopId][cardId]["num"]=num;
+			// 对应商店列表 进行计数，并且更新cp值
+			if(num!=-1&&num!=0){
+				cnt("uCnt");
+				cnt(shopId+"_uc");
+				cp(shopId);					
+			}			
 		}
 	});
+	// 显示商店列表页面
+	showShopList();
+	
+	// 判断是否启动卡片监控功能
+	if(bg.MOD_NOW["mod_craftFocus"]){
+		bg.debug("启动Mod功能:合成商店卡片监控");
+		isModCraftFocus=true;
+	}else{
+		isModCraftFocus=false;
+	}
 }
 /********************************* 重构区******************/
 // 显示商店列表页面
@@ -151,7 +146,7 @@ function loadShopList(){
 						} 
 						// 从csj中获得卡片数量
 						//发送消息，获取合成卡片数量
-						port.postMessage({"cmd":"getCardNum","id":sc.cardId,"shopId":sc.shopId});
+						port_bg.postMessage({"cmd":"bg.getCardNum","un":userName,"id":sc.cardId,"shopId":sc.shopId});
 						// 商店卡片计数
 						cnt(sc.shopId+"_sc");
 						// 卡片计数器
@@ -226,7 +221,7 @@ function showCardList(){
 					tdTmp3.querySelector('input').addEventListener('click', setFocusStatus);
 					// 核查监控卡片状态
 					var fsPort=getFocusPort();
-					fsPort.postMessage({"cmd":"check","id":cId});
+					fsPort.postMessage({"cmd":"bg.checkFocusCard","un":userName,"id":cId});
 			}else{
 				tdTmp3.innerHTML="";
 			}
@@ -275,15 +270,15 @@ function clsDiv(){
 	var objE = document.getElementById("cardDiv");
 　　objE.innerHTML = "";
 }
-/*************************** 监控卡片功能区 *******************/
+/*************************** mod_craftFocus 监控卡片功能区 *******************/
 var focusPort;
 function getFocusPort(){
 	if(focusPort){
 	}else{
-		focusPort = chrome.tabs.connect(tabId,{name: "mod_craftFocus"});
+		focusPort=chrome.runtime.connect({name: "BG#"+"mod_craftFocus"});
 		focusPort.onMessage.addListener(function(msg) {
-			bg.debug("收到"+focusPort.name+"通道消息："+JSON.stringify(msg));
-			if (msg.cmd == "check.rs"){
+			bg.debug("pop_"+modName+"收到"+focusPort.name+"通道消息："+JSON.stringify(msg));
+			if (msg.cmd == "bg.checkFocusCard.rs"){
 				document.getElementById(msg.id).checked=msg.data;// true or false
 			}
 		});
@@ -298,9 +293,9 @@ function setFocusStatus(){
 		cf["cardId"]=b.id;
 		cf["cardName"]=b.name;
 		cf["num"]=b.value;
-		fsPort.postMessage({"cmd":"add","data":cf,"id":b.id});
+		fsPort.postMessage({"cmd":"bg.saveFocusCard","un":userName,"data":cf,"id":b.id});
 	}else{
-		fsPort.postMessage({"cmd":"del","id":b.id});
+		fsPort.postMessage({"cmd":"bg.delFocusCard","un":userName,"id":b.id});
 	}
 }
 /*************************** 权限控制区 *******************/

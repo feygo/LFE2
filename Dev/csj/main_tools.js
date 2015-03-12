@@ -68,10 +68,11 @@ function Tool_getObjLength(obj){
 }
 /**********************页面信息处理 功能区***************************/
 function Tool_getHref(str){
-	if(str.indexOf("http://www.linodas.com")!=-1){
-		return str.replace("http://www.linodas.com","");
-	}
-	return null;
+	return str.replace(/http(|s):\/\/.*\.linodas\.com/gi,"");
+	// if(str.indexOf("http://www.linodas.com")!=-1){
+		// return str.replace("http://www.linodas.com","");
+	// }
+	// return null;
 }
 function Tool_getCardData(){
 	return {"cardId":"","cardName":"","str":"","dex":"","ent":"","con":"","lv":"","cardType":"","tech1":"","tech2":""};

@@ -1,23 +1,24 @@
 ﻿/** 后台通讯区 */
+var modName="mod_craftFocus";
 var bg = chrome.extension.getBackgroundPage();   
 bg.log("popup load pop_mod_craftFocus.js");
 /*********************** 页面通道 通讯区 *********************/
-var port;
+var userName=bg.Tool_getUserName(location.search);
+var port_bg;
+
 function loadPort(){
-	chrome.tabs.getSelected(function(tab){
-		port = chrome.tabs.connect(tab.id,{name: "mod_craftFocus"});
-		loadFocusCardList();
-		
-		/** 业务功能区 */
-		port.onMessage.addListener(function(msg) {
-			bg.debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
-			if (msg.cmd == "load.rs"){
-				showFocusCardList(msg.data);
-				getCraftItem(msg.id);
-				getCardInfo(msg.id);
-			}
-		});
+	port_bg=chrome.runtime.connect({name: "BG#"+modName});
+	port_bg.onMessage.addListener(function(msg) {
+		bg.debug("pop_"+modName+"收到"+port_bg.name+"通道消息："+JSON.stringify(msg));	
 	});
+	port_bg.onMessage.addListener(function(msg) {
+		if (msg.cmd == "bg.loadFocusCard.rs"){
+			showFocusCardList(msg.data);
+			getCraftItem(msg.id);
+			getCardInfo(msg.id);	
+		}
+	});
+	loadFocusCardList();
 }
 
 /********************************* 页面载入区 扩展******************/
@@ -26,7 +27,7 @@ function loadFocusCardList(){
 	var rTable=document.getElementById("focusList");
 	addFocusTitle(rTable);
 	// 发送load消息
-	port.postMessage({"cmd":"load"});
+	port_bg.postMessage({"cmd":"bg.loadFocusCard","un":userName});
 }
 
 // 添加监控卡片列表 表头
@@ -142,7 +143,7 @@ function getCardInfo(cardId){
 // 删除监控卡片
 function delFocusCard(){
 	var b=event.srcElement;
-	port.postMessage({"cmd":"del","id":b.value});
+	port_bg.postMessage({"cmd":"bg.delFocusCard","un":userName,"id":b.value});
 	// 删除页面的tr
 	var table=document.getElementById("focusList");
 	table.removeChild(b.parentElement.parentElement);	

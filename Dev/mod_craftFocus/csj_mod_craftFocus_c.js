@@ -1,41 +1,31 @@
 log("load csj_mod_craftFocus_c.js");
 
 /************************ 核查监控卡片 区 **********************/
-function checkFocusCard(){
-	var objectStore=DB_CF_C.transaction([DB_OS_CF], "readwrite").objectStore(DB_OS_CF);
-	var request = objectStore.openCursor();
-	request.onsuccess = function(evt) {
-		var cursor=request.result;
-		if(cursor){
-			var cf=cursor.value;
-			var num=document.querySelector("#inner_card_num"+cf.cardId);
-			if(num){
-				var cardnum=parseInt(num.innerText);
-				if(cardnum!=cf.num){
-					cf.num=cardnum;
-					var pReq=objectStore.put(cf);
-					pReq.onsuccess = function(evt) {
-						debug("更新监控卡片信息："+JSON.stringify(evt.target.result));
-					}
-				}
-			}
-			cursor.continue();		
+function checkFocusCard(cfData){
+	var num=document.querySelector("#inner_card_num"+cfData.cardId);
+	if(num){
+		var cardnum=parseInt(num.innerText);
+		if(cardnum!=cfData.num){
+			cfData.num=cardnum;
+			var port_bg=getBgPort(FC_N);
+			port_bg.postMessage({"cmd":"bg.saveFocusCard","un":USER_NAME,"data":cfData});
 		}
 	}
 }
-
-/************************ 数据预备区 **********************/
-var DB_OS_CF;
-var DB_CF_C;
-function success_DB_CF_C(db){
-	DB_OS_CF = DC[FOCUSCARD_N][0];
-	DB_CF_C = db;
-	checkFocusCard();
+function loadFocusCard(){
+	var port_bg=getBgPort(FC_N);
+	port_bg.postMessage({"cmd":"bg.loadFocusCard","un":USER_NAME});
+}
+/********************** 通道消息 处理区**********************/
+// 用于处理bg的port
+function listener_modCraftFocus(msg){
+	if (msg.cmd == "bg.loadFocusCard.rs"){	
+		checkFocusCard(msg.data);
+	}
 }
 /********************** 自动执行区**********************/
-var FOCUSCARD_N="mod_craftFocus";
-function csjLoad_mod_cf_c(){
-	Tool_connUserDB(success_DB_CF_C);
-}
-csjLoad_mod_cf_c();
+var FC_N="mod_craftFocus";
+
+getBgPort(FC_N).onMessage.addListener(listener_modCraftFocus);
+loadFocusCard();
 log("load csj_mod_craftFocus_c.js done");

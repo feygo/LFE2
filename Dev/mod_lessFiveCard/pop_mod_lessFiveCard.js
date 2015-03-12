@@ -1,41 +1,63 @@
 ﻿/** 后台通讯区 */
+var modName="mod_lessFiveCard";
 var bg = chrome.extension.getBackgroundPage();   
 bg.log("popup load pop_mod_lessFiveCard.js");
 /*********************** 页面通道 通讯区 *********************/
-var port;
+var userName=bg.Tool_getUserName(location.search);
+var port_bg;
 function loadPort(){
-	chrome.tabs.getSelected(function(tab){
-		port = chrome.tabs.connect(tab.id,{name: "mod_lessFiveCard"});
-		loadLessFive();
-		
-		/**
-		页面操作指令 消息结构：{"cmd":"loadDeck","dId":slt.value}
-		页面操作反馈 消息结构：{"rs":list};
-		*/
-		/** 业务功能区 */
-		port.onMessage.addListener(function(msg) {
-			bg.debug("收到"+port.name+"通道消息："+JSON.stringify(msg));
-			if (msg.cmd == "load.rs"){
-				var card=msg.data;
-				bg.debug(card);
-				if(card.lv<10){
-					var msg="Lv."+card.lv+"   "+card.cardName+" "+card.num+"张\n";
-				}else{
-					var msg="Lv."+card.lv+" "+card.cardName+" "+card.num+"张\n";
-				}
-				document.querySelector("#lessFiveBoard").value+=msg;
-			}
-		});	
-		
+	port_bg=chrome.runtime.connect({name: "BG#"+modName});
+	port_bg.onMessage.addListener(function(msg) {
+		bg.debug("pop_"+modName+"收到"+port_bg.name+"通道消息："+JSON.stringify(msg));	
 	});
+	port_bg.onMessage.addListener(function(msg) {
+		if (msg.cmd == "bg.loadLFive.rs"){
+			if(msg.stat=="success"){
+				addCardTr(msg.data);
+			}
+		}
+	});
+	// 载入不满5张卡片列表
+	loadLessFive();
 }
 
-
-// 载入卡组列表
+// 载入卡片列表
 function loadLessFive(){
-	var msg={"cmd":"load"};
-	document.querySelector("#lessFiveBoard").value="";
-	port.postMessage(msg);
+	document.querySelector("#fiveShow").innerHTML="";
+	port_bg.postMessage({"cmd":"bg.loadLFive","un":userName});
+	addCardTitle();
+}
+function addCardTitle(){
+	var tr=document.createElement("tr");
+	var td1=document.createElement("td");				
+	td1.className='name c5';
+	td1.innerHTML="等级";
+	var td2=document.createElement("td");				
+	td2.className='name c5';
+	td2.innerHTML="卡片名称";
+	var td3=document.createElement("td");				
+	td3.className='name c5';
+	td3.innerHTML="现有数量";
+	tr.appendChild(td1);
+	tr.appendChild(td2);
+	tr.appendChild(td3);
+	document.querySelector("#fiveShow").appendChild(tr);	
+}
+function addCardTr(card){
+	var tr=document.createElement("tr");
+	var td1=document.createElement("td");				
+	td1.className=card.cardType+" boldtitle";
+	td1.innerHTML="Lv."+card.lv;
+	var td2=document.createElement("td");				
+	td2.className=card.cardType+" boldtitle";
+	td2.innerHTML=card.cardName;
+	var td3=document.createElement("td");				
+	td3.className=card.cardType+" boldtitle";
+	td3.innerHTML=card.num+"张";
+	tr.appendChild(td1);
+	tr.appendChild(td2);
+	tr.appendChild(td3);
+	document.querySelector("#fiveShow").appendChild(tr);
 }
 
 /**************窗体事件区*********************/
