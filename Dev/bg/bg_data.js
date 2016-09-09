@@ -7,11 +7,11 @@
 const DB_NAME = 'LFE2#DB';
 /******************数据对象区***************************/
 // 对象结构
-const DB_OS_CITY_PVP = "city#pvp";
-const DB_OS_SHOP_ALL = "shop#all";
-const DB_OS_SHOP_ITEM = "shop#item";
-const DB_OS_SHOP_CARD = "shop#card";
-const DB_OS_CRAFT_ITEM = "craft#item";
+var DB_OS_CITY_PVP = "city#pvp";
+var DB_OS_SHOP_ALL = "shop#all";
+var DB_OS_SHOP_ITEM = "shop#item";
+var DB_OS_SHOP_CARD = "shop#card";
+var DB_OS_CRAFT_ITEM = "craft#item";
 
 var db_osList=[DB_OS_CITY_PVP,DB_OS_SHOP_ALL,DB_OS_SHOP_ITEM,DB_OS_SHOP_CARD,DB_OS_CRAFT_ITEM];
 /*******************数据库 链接区 **********************/
@@ -62,6 +62,8 @@ function Tool_getDB(osList,success_DB){
 		}
 	}
 	// 如果合法，就获取数据库连接
+	debug(cnt);
+	debug(osList);
 	if(cnt==osList.length){
 		Tool_getDB_ext(DB_NAME,osList,update_DB,success_DB);
 	}else{

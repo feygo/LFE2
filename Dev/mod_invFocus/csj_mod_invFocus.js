@@ -44,7 +44,7 @@ function success_DB_IF(db){
 var INVFOCUS_N="mod_invFocus";
 function csjLoad_mod_invFocus(){
 	chrome.runtime.onConnect.addListener(handlePort_modInvFocus);
-	Tool_connUserDB(success_DB_IF);
+	//Tool_connUserDB(success_DB_IF);
 }
 csjLoad_mod_invFocus();
 log("load csj_mod_invFocus.js done");

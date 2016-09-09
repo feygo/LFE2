@@ -26,9 +26,10 @@ function loadPort(){
 			}			
 		}
 	});
+
 	// 显示商店列表页面
 	showShopList();
-	
+
 	// 判断是否启动卡片监控功能
 	if(bg.MOD_NOW["mod_craftFocus"]){
 		bg.debug("启动Mod功能:合成商店卡片监控");
@@ -113,6 +114,8 @@ function cp(shopId){
 }
 //载入商店列表
 function loadShopList(){
+	bg.debug(bg.DB_OS_SHOP_ALL);
+	bg.debug(bg);
 	bg.Tool_getDB([bg.DB_OS_SHOP_ALL],function(evt){
 		var db = evt.currentTarget.result;
 		var txn=db.transaction([bg.DB_OS_SHOP_ALL,bg.DB_OS_SHOP_CARD], "readonly")
