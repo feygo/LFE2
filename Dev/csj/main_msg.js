@@ -40,6 +40,9 @@ function handlePort_main(port){
 			if (msg.cmd == "getUserName"){
 				port.postMessage({"cmd":"getUserName.rs","data":USER_NAME});
 			}
+			if (msg.cmd == "getUserInv"){
+				port.postMessage({"cmd":"getUserInv.rs","data":getUserInv()});
+			}			
 		});
 	}
 }

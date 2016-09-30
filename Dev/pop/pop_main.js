@@ -17,7 +17,7 @@ chrome.tabs.getSelected(function(tab){
 		if (msg.cmd == "getUserName.rs"){	
 			var userName=msg.data;
 			loadButton(userName,cp);
-		}			
+		}		
 	});
 });
 function loadButton(userName){

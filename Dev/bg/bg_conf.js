@@ -235,14 +235,10 @@ console.log("load bg_conf.js");
 		"mod":"背包材料监控",
 		"modconf":{},
 		"dept":[],
-		"bg":[],
+		"bg":["../mod_invFocus/bg_mod_invFocus.js"],
 		"urlist":[
 				{	"url":"#/character/inventory",
 					"js":["/mod_invFocus/csj_mod_invFocus_ci.js"],
-					"pop":""
-				},
-				{	"url":"#/*",
-					"js":["/mod_invFocus/csj_mod_invFocus.js"],
 					"pop":""
 				}
 		],

@@ -2,45 +2,59 @@
 var bg = chrome.extension.getBackgroundPage();   
 bg.log("popup load pop_mod_craftFocusItem.js");
 /*********************** 页面通道 通讯区 *********************/
+var userName=bg.Tool_getUserName(location.search);
+var userInv;
 var port_cf;
 var port_if;
+var port_main;
+
 function loadPort(){
-	chrome.tabs.getSelected(function(tab){
-		port_cf = chrome.tabs.connect(tab.id,{name: "mod_craftFocus"});
+	
+		port_cf=chrome.runtime.connect({name: "BG#"+"mod_craftFocus"});
 		// 载入监控卡片列表
 		loadFocusCard();
 		
 		// 接收监控卡片列表
 		port_cf.onMessage.addListener(function(msg) {
 			bg.debug("收到"+port_cf.name+"通道消息："+JSON.stringify(msg));
-			if (msg.cmd == "load.rs"){
+			if (msg.cmd == "bg.loadFocusCard.rs"){
 				showCardList(msg.data);
 				getCraftItem(msg.id);
 			}
 		});
 		
-		port_if = chrome.tabs.connect(tab.id,{name: "mod_invFocus"});
+		port_if = chrome.runtime.connect({name: "BG#"+"mod_invFocus"});
 		port_if.onMessage.addListener(function(msg) {
 			bg.debug("收到"+port_if.name+"通道消息："+JSON.stringify(msg));
-			if (msg.cmd == "get.rs"){
+			if (msg.cmd == "bg.getItem.rs"){
 				// 更新合成材料的背包数量
+				// {"cmd":"bg.loadFocusCard","un":USER_NAME}
 				var itemNum=setItemN(msg.id,msg.data);	
 				// 更新卡片状态中的材料数量
 				updateItemToCardStat(msg.id,itemNum);
 				// 更新卡片状态
 				checkCardStat();
-			}else if(msg.cmd == "getUserInv.rs"){
-				updateUserInv(msg.data);			
 			}
 		});
 		// 获取用户背包数量
 		loadUserInv();
-	});
+
 }
 // 载入用户背包数据
 function loadUserInv(){
-	port_if.postMessage({"cmd":"getUserInv"});
+	chrome.tabs.getSelected(function(tab){
+		port_main = chrome.tabs.connect(tab.id,{name: "MAIN"});
+		port_main.postMessage({"cmd":"getUserInv"});
+		port_main.onMessage.addListener(function(msg) {
+			bg.debug("收到"+port_main.name+"通道消息："+JSON.stringify(msg));
+			if (msg.cmd == "getUserInv.rs"){	
+				userInv=msg.data;
+				updateUserInv(msg.data);			
+			}		
+		});	
+	});
 }
+
 function updateUserInv(data){
 	document.getElementById("nNum").innerText=data.nNum;
 	document.getElementById("tNum").innerText=data.tNum;
@@ -53,7 +67,7 @@ function loadFocusCard(){
 	clsList();
 	addTitle();
 	// 载入监控卡片列表
-	port_cf.postMessage({"cmd":"load"});
+	port_cf.postMessage({"cmd":"bg.loadFocusCard","un":userName});	
 }
 // 载入监控列表表头
 function addTitle(){
@@ -366,7 +380,7 @@ function getCraftItem(cardId){
 					// 获取背包材料的相关信息
 					if(itemCache[item.itemId]){
 					}else{
-						port_if.postMessage({"cmd":"get","id":item.itemId});
+						port_if.postMessage({"cmd":"bg.getItem","un":userName,"id":item.itemId});
 						itemCache[item.itemId]=1;
 					}
 

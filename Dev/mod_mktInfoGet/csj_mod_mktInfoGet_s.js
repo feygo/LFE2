@@ -67,7 +67,12 @@ function getShopCraft(shopId,frm){
 				var itemCraft={"itemId":"","itemName":"","reqNum":"","cardId":""}
 				itemCraft.cardId=cardData.cardId;
 				itemCraft.itemId=itemList[j].id.replace("item","");
-				itemCraft.itemName=Tool_trim(itemList[j].querySelector("nobr").innerText);
+				// 因为发现存在卡片合成卡片的情况，所以做了特殊判断，但观察规则
+				if(itemList[j].querySelector("nobr")){
+					itemCraft.itemName=Tool_trim(itemList[j].querySelector("nobr").innerText);
+				}else{
+					itemCraft.itemName=Tool_trim(itemList[j].querySelector("span").innerText);
+				}
 
 				var tmpNum=itemList[j].nextSibling.nodeValue;
 				itemCraft.reqNum=tmpNum.match(/\d+/gi)[0];
